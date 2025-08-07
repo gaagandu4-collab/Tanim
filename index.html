@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grok's Black Hole - Tanim AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Orbitron:wght@400;700&family=Michroma&display=swap" rel="stylesheet">
+    
+    <!-- MathJax Configuration -->
+    <script>
+        window.MathJax = {
+          tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\\[', '\\]']]
+          },
+          svg: {
+            fontCache: 'global'
+          }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+    </script>
+
+    <style>
+        :root {
+            --bg-main: #1F1301;
+            --glass-bg-rgba: 90, 57, 8, 0.6;
+            --accent-color: #FFA800;
+            --accent-dark: #9D5A0B;
+            --accent-rgb: 255, 168, 0;
+            --text-main: #f0f0f0;
+            --text-dark: #1F1301;
+        }
+
+        /* General Body and Background Styles */
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #000;
+            font-family: 'Hind Siliguri', sans-serif;
+            color: var(--text-main);
+        }
+
+        /* Canvas for WebGL background */
+        #glcanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1; /* Place canvas behind all other content */
+            display: block;
+        }
+
+        /* Chat UI Styles */
+        .font-orbitron { font-family: 'Orbitron', sans-serif; }
+        .glass-ui {
+            background: rgba(var(--glass-bg-rgba), 0.5); /* Slightly more transparent */
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(var(--accent-rgb), 0.2);
+        }
+        .glass-btn {
+            background: rgba(var(--accent-rgb), 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(var(--accent-rgb), 0.3);
+            transition: all 0.3s ease;
+            color: var(--accent-color);
+        }
+        .glass-btn:hover {
+            background: rgba(var(--accent-rgb), 0.2);
+            border-color: rgba(var(--accent-rgb), 0.6);
+            box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.25);
+        }
+        #chat-container::-webkit-scrollbar { width: 6px; }
+        #chat-container::-webkit-scrollbar-track { background: transparent; }
+        #chat-container::-webkit-scrollbar-thumb { background: rgba(var(--accent-rgb), 0.4); border-radius: 3px; }
+        
+        /* New Animated Logo Style */
+        #logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem; /* 12px */
+        }
+        #text-overlay {
+            position: relative;
+            font-family: 'Michroma', sans-serif;
+            font-weight: normal;
+            font-size: 1.75rem; /* Adjusted for header */
+            pointer-events: none;
+            background: linear-gradient(90deg, #ff00ae, #ff7300, #4d00ff, #00c8ff, #ff00ae);
+            background-size: 400% 100%;
+            animation: mix-colors 8s linear infinite;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        @keyframes mix-colors {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 400% 50%; }
+        }
+
+        /* Other UI element styles */
+        .loader-spinner {
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-color);
+            border-color: var(--accent-color) transparent var(--accent-color) transparent;
+            animation: spin 1.2s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .message-bubble {
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+        .message-bubble.user { background-color: #5A3908; }
+        .message-bubble.ai { background-color: #3a2505; }
+        .tts-btn { cursor: pointer; opacity: 0.6; transition: opacity 0.2s; }
+        .tts-btn:hover { opacity: 1; }
+        .tts-btn.playing .speaker-icon-on { display: block; }
+        .tts-btn.playing .speaker-icon-off { display: none; }
+        .tts-btn .speaker-icon-on { display: none; }
+        #mic-btn.listening {
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(var(--accent-rgb), 0); }
+            100% { box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0); }
+        }
+    </style>
+</head>
+<body class="overflow-hidden">
+
+    <!-- Canvas for the WebGL animation -->
+    <canvas id="glcanvas"></canvas>
+
+    <!-- Main Chat Application Wrapper -->
+    <div class="w-screen h-screen flex flex-col absolute top-0 left-0">
+        <!-- Header -->
+        <header class="glass-ui p-3 flex justify-between items-center z-10 shadow-lg">
+            <!-- New Animated Logo with Icon -->
+            <div id="logo-container">
+                <div id="text-overlay">Tanim AI</div>
+                <canvas id="logo-canvas" width="64" height="64" style="width: 2.5rem; height: 2.5rem;"></canvas>
+            </div>
+            <div>
+                <button id="summarize-btn" class="glass-btn rounded-md px-3 py-1 text-sm font-semibold mr-2" data-lang-key="summarize_btn"></button>
+                <button id="lang-toggle-btn" class="glass-btn rounded-md px-3 py-1 text-sm font-semibold"></button>
+            </div>
+        </header>
+
+        <!-- Chat Container -->
+        <main id="chat-container" class="flex-1 p-4 overflow-y-auto">
+            <!-- Initial Message -->
+            <div class="flex justify-start mb-4">
+                <div class="message-bubble ai text-white p-3 rounded-lg max-w-[85%] inline-block" data-lang-key="welcome_message"></div>
+            </div>
+        </main>
+
+        <!-- Image Preview Area -->
+        <div id="image-preview-container" class="hidden p-2 px-4 glass-ui z-10">
+             <div class="relative inline-block">
+                <img id="image-preview" src="" class="h-20 w-20 object-cover rounded-md" style="border: 1px solid var(--accent-dark);">
+                <button id="remove-image-btn" class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full h-6 w-6 flex items-center justify-center text-xs font-bold">&times;</button>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <footer class="p-4 glass-ui z-10">
+            <form id="chat-form" class="flex items-center gap-3">
+                <button type="button" id="gallery-btn" class="glass-btn p-2.5 rounded-full flex-shrink-0" title="Upload Image">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/></svg>
+                </button>
+                <input type="file" id="image-upload-input" class="hidden" accept="image/*">
+                <input type="text" id="prompt-input" class="w-full px-4 py-2 bg-black/30 border rounded-full focus:outline-none focus:ring-2 text-white transition" style="border-color: var(--accent-dark); --tw-ring-color: var(--accent-color);" data-lang-key="placeholder">
+                <button type="submit" id="send-btn" class="text-black font-bold p-2.5 rounded-full shadow-lg transform hover:scale-105 transition flex-shrink-0" style="background-color: var(--accent-color);">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z"/></svg>
+                </button>
+                <button type="button" id="stop-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold p-2.5 rounded-full shadow-lg transform hover:scale-105 transition hidden flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><rect width="16" height="16" fill="currentColor"/></svg>
+                </button>
+                <button type="button" id="mic-btn" class="glass-btn p-2.5 rounded-full flex-shrink-0" title="Voice Input">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5z"/>
+                        <path d="M8 1a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                    </svg>
+                </button>
+            </form>
+        </footer>
+    </div>
+    
+    <!-- Summary Modal -->
+    <div id="summary-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+        <div class="glass-ui rounded-lg p-6 max-w-2xl w-full max-h-[80vh] flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold" style="color: var(--accent-color);" data-lang-key="summary_title"></h2>
+                <button id="close-modal-btn" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+            </div>
+            <div id="summary-content" class="overflow-y-auto text-gray-300"></div>
+            <div id="summary-loading" class="hidden text-center p-4">
+                <div class="loader-spinner mx-auto"></div>
+                <p class="mt-2" data-lang-key="summarizing"></p>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // --- WebGL Black Hole Animation Script ---
+        (function() {
+            const vsSource = `attribute vec2 a_position; void main() { gl_Position = vec4(a_position, 0.0, 1.0); }`;
+            const fsSource = `
+                precision mediump float;
+                uniform float t;
+                uniform vec2 r;
+
+                vec2 myTanh(vec2 x) {
+                    vec2 ex = exp(x);
+                    vec2 emx = exp(-x);
+                    return (ex - emx) / (ex + emx);
+                }
+
+                void main() {
+                    vec4 o_bg = vec4(0.0);
+                    vec4 o_anim = vec4(0.0);
+                    // This line will be replaced for the logo canvas
+                    vec2 center_offset = vec2(r.x * 0.65, r.y * 0.5);
+
+                    {
+                        vec2 p_img = ((gl_FragCoord.xy - center_offset) * 2.0) / r.y;
+                        p_img.xy = vec2(p_img.y, -p_img.x);
+                        p_img *= 2.5;
+                        vec2 l_val = myTanh(p_img * 5.0 + 2.0);
+                        l_val = min(l_val, l_val * 3.0);
+                        vec2 clamped = clamp(l_val, -2.0, 0.0);
+                        float diff_y = clamped.y - l_val.y;
+                        float safe_px = abs(p_img.x) < 0.001 ? 0.001 : p_img.x;
+                        float term = (0.1 - max(0.01 - dot(p_img, p_img) / 200.0, 0.0) * (diff_y / safe_px)) / abs(length(p_img) - 0.7);
+                        o_bg += vec4(term);
+                        o_bg *= max(o_bg, vec4(0.0));
+                    }
+
+                    {
+                        vec2 p_base = ((gl_FragCoord.xy - center_offset) * 2.0) / r.y;
+                        p_base *= 2.5;
+                        vec2 p_anim = vec2(p_base.y, -p_base.x);
+                        float angle = -400.0 * 3.14159 / 180.0;
+                        float s = sin(angle);
+                        float c_rot = cos(angle);
+                        mat2 rotMat = mat2(c_rot, -s, s, c_rot);
+                        vec2 p_effect = rotMat * p_base;
+                        vec2 d = vec2(-1.0, 1.0);
+                        float denom = 0.1 + 5.0 / dot(5.0 * p_effect - d, 5.0 * p_effect - d);
+                        vec2 c = p_effect * mat2(1.0, 1.0, d.x / denom, d.y / denom);
+                        vec2 v = c;
+                        vec4 animAccum = vec4(0.0);
+                        for (int i = 1; i <= 9; i++) {
+                            float fi = float(i);
+                            animAccum += sin(vec4(v.x, v.y, v.y, v.x)) + vec4(1.0);
+                            v += 0.7 * sin(vec2(v.y, v.x) * fi + t) / fi + 0.5;
+                        }
+                        vec4 animTerm = 1.0 - exp(-exp(c.x * vec4(0.6, -0.4, -1.0, 0.0)) / animAccum / (0.1 + 0.1 * pow(length(sin(v / 0.3) * 0.2 + c * vec2(1.0, 2.0)) - 1.0, 2.0)) / (1.0 + 7.0 * exp(0.3 * c.y - dot(c, c))) / (0.03 + abs(length(p_anim) - 0.7)) * 0.2);
+                        o_anim += animTerm;
+                    }
+
+                    vec4 finalColor = mix(o_bg, o_anim, 0.5) * 1.5;
+                    finalColor = clamp(finalColor, 0.0, 1.0);
+                    gl_FragColor = finalColor;
+                }
+            `;
+            
+            function setupWebGL(canvasId, isLogo) {
+                const canvas = document.getElementById(canvasId);
+                if (!canvas) return;
+                const gl = canvas.getContext('webgl');
+                if (!gl) {
+                    console.error(`WebGL not supported for canvas: ${canvasId}`);
+                    if (!isLogo) {
+                        document.body.style.backgroundColor = '#1F1301';
+                        canvas.style.display = 'none';
+                    }
+                    return;
+                }
+
+                let finalFsSource = fsSource;
+                if (isLogo) {
+                    finalFsSource = fsSource.replace(
+                        'vec2 center_offset = vec2(r.x * 0.65, r.y * 0.5);',
+                        'vec2 center_offset = vec2(r.x * 0.5, r.y * 0.5);'
+                    );
+                }
+
+                const program = createProgram(gl, createShader(gl, gl.VERTEX_SHADER, vsSource), createShader(gl, gl.FRAGMENT_SHADER, finalFsSource));
+                if (!program) return;
+                gl.useProgram(program);
+
+                const positionLocation = gl.getAttribLocation(program, 'a_position');
+                const timeLocation = gl.getUniformLocation(program, 't');
+                const resolutionLocation = gl.getUniformLocation(program, 'r');
+
+                const vertices = new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]);
+                const buffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+                gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+                gl.enableVertexAttribArray(positionLocation);
+                gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+
+                function resize() {
+                    canvas.width = window.innerWidth;
+                    canvas.height = window.innerHeight;
+                    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+                }
+
+                if (!isLogo) {
+                    window.addEventListener('resize', resize);
+                    resize();
+                } else {
+                    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+                }
+
+                let startTime = performance.now();
+                function render() {
+                    let currentTime = performance.now();
+                    let delta = (currentTime - startTime) / 1000;
+                    gl.uniform1f(timeLocation, delta);
+                    gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
+                    gl.drawArrays(gl.TRIANGLES, 0, 6);
+                    requestAnimationFrame(render);
+                }
+                requestAnimationFrame(render);
+            }
+
+            function createShader(gl, type, source) {
+                const shader = gl.createShader(type);
+                gl.shaderSource(shader, source);
+                gl.compileShader(shader);
+                if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                    console.error('Shader compile error: ' + gl.getShaderInfoLog(shader));
+                    gl.deleteShader(shader); return null;
+                }
+                return shader;
+            }
+
+            function createProgram(gl, vertexShader, fragmentShader) {
+                if (!vertexShader || !fragmentShader) return null;
+                const program = gl.createProgram();
+                gl.attachShader(program, vertexShader);
+                gl.attachShader(program, fragmentShader);
+                gl.linkProgram(program);
+                if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+                    console.error('Program link error: ' + gl.getProgramInfoLog(program));
+                    gl.deleteProgram(program); return null;
+                }
+                return program;
+            }
+
+            // Initialize both canvases
+            setupWebGL('glcanvas', false);
+            setupWebGL('logo-canvas', true);
+        })();
+
+        // --- Chat Application Script ---
+        const langToggleBtn = document.getElementById('lang-toggle-btn');
+        const chatContainer = document.getElementById('chat-container');
+        const chatForm = document.getElementById('chat-form');
+        const promptInput = document.getElementById('prompt-input');
+        const sendBtn = document.getElementById('send-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const micBtn = document.getElementById('mic-btn');
+        const galleryBtn = document.getElementById('gallery-btn');
+        const imageUploadInput = document.getElementById('image-upload-input');
+        const imagePreviewContainer = document.getElementById('image-preview-container');
+        const imagePreview = document.getElementById('image-preview');
+        const removeImageBtn = document.getElementById('remove-image-btn');
+        const summarizeBtn = document.getElementById('summarize-btn');
+        const summaryModal = document.getElementById('summary-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const summaryContent = document.getElementById('summary-content');
+        const summaryLoading = document.getElementById('summary-loading');
+
+        let currentLang = 'bn';
+        let uploadedImageBase64 = null;
+        let currentAudio = null;
+        let currentPlayingBtn = null;
+        let abortController = null;
+        
+        const systemInstruction = {
+            role: "system",
+            parts: [{ text: "You are Tanim AI, a helpful AI assistant. Your primary language is Bengali (Bangla). Your secondary language is English. Use 'Assalamualaikum' only for the very first greeting if appropriate, but do not repeat it in every subsequent response. Never use 'Nomoskar'. When answering questions about math, physics, or chemistry, ALWAYS format equations and formulas using LaTeX code. For formulas that are part of a sentence, use single dollar signs (e.g., the formula is $E=mc^2$). For standalone equations that need their own line, use double dollar signs (e.g., $$x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}$$). Ensure text flows naturally around inline formulas without unnecessary line breaks. Write your answers in a well-organized, eloquent, and beautiful style. Be thorough and clear." }]
+        };
+        let chatHistory = [];
+
+        const translations = {
+            en: { welcome_message: "Assalamualaikum, I am Tanim AI. How can I help you?", placeholder: "Type your message...", lang_btn: "বাংলা", summarize_btn: "✨ Summarize", summary_title: "Conversation Summary", summarizing: "Summarizing...", error_message: "Sorry, an error occurred. Please try again." },
+            bn: { welcome_message: "আসসালামু আলাইকুম, আমি তানিম এআই। আমি আপনাকে কিভাবে সাহায্য করতে পারি?", placeholder: "আপনার বার্তা লিখুন...", lang_btn: "English", summarize_btn: "✨ সারসংক্ষেপ", summary_title: "কথোপকথনের সারসংক্ষেপ", summarizing: "সারসংক্ষেপ করা হচ্ছে...", error_message: "দুঃখিত, একটি ত্রুটি ঘটেছে। অনুগ্রহ করে আবার চেষ্টা করুন।" }
+        };
+
+        const setLanguage = (lang) => {
+            currentLang = lang;
+            document.querySelectorAll('[data-lang-key]').forEach(el => {
+                const key = el.getAttribute('data-lang-key');
+                if (translations[lang][key]) {
+                    if (el.tagName === 'INPUT') el.placeholder = translations[lang][key];
+                    else el.innerHTML = translations[lang][key];
+                }
+            });
+            langToggleBtn.textContent = translations[lang].lang_btn;
+        };
+
+        const addMessageToUI = (text, sender, imageSrc = null) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = `flex mb-4 ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
+            
+            const bubble = document.createElement('div');
+            // Using 'inline-block' to make the bubble width fit its content
+            bubble.className = `message-bubble ${sender} p-3 rounded-lg max-w-[85%] inline-block`;
+
+            if (imageSrc) {
+                const img = document.createElement('img');
+                img.src = imageSrc;
+                img.className = 'rounded-md mb-2 max-w-full h-auto';
+                bubble.appendChild(img);
+            }
+            
+            const textElement = document.createElement('div');
+            textElement.innerHTML = text.replace(/\n/g, '<br>');
+            bubble.appendChild(textElement);
+
+            if (sender === 'ai') {
+                const ttsBtn = document.createElement('button');
+                ttsBtn.className = 'tts-btn ml-2 align-middle inline-block';
+                ttsBtn.innerHTML = `<svg class="speaker-icon-off" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M11.536 14.01A8.473 8.473 0 0 0 14.026 8a8.473 8.473 0 0 0-2.49-6.01l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707z"/><path d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.483 5.483 0 0 1 11.025 8a5.483 5.483 0 0 1-1.61 3.89l.706.706z"/><path d="M8.707 11.182A4.486 4.486 0 0 0 10.025 8a4.486 4.486 0 0 0-1.318-3.182L8 5.525A3.489 3.489 0 0 1 9.025 8 3.49 3.49 0 0 1 8 10.475l.707.707zM6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.063-1.89a.5.5 0 0 1 .829-.06z"/></svg><svg class="speaker-icon-on" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M11.536 14.01A8.473 8.473 0 0 0 14.026 8a8.473 8.473 0 0 0-2.49-6.01l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707zm-1.414-.707A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.483 5.483 0 0 1 11.025 8a5.483 5.483 0 0 1-1.61 3.89l.706.706zm-1.414-.707A4.486 4.486 0 0 0 10.025 8a4.486 4.486 0 0 0-1.318-3.182L8 5.525A3.489 3.489 0 0 1 9.025 8 3.49 3.49 0 0 1 8 10.475l.707.707zM6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.063-1.89a.5.5 0 0 1 .829-.06z"/></svg>`;
+                ttsBtn.onclick = () => handleTTS(text, ttsBtn);
+                bubble.appendChild(ttsBtn);
+            }
+            
+            wrapper.appendChild(bubble);
+            chatContainer.appendChild(wrapper);
+            
+            if (sender === 'ai' && window.MathJax) {
+                MathJax.typesetPromise([bubble]);
+            }
+            // Auto-scrolling is disabled as per request
+        };
+
+        const showLoadingIndicator = () => {
+            const loaderWrapper = document.createElement('div');
+            loaderWrapper.id = 'ai-loader';
+            loaderWrapper.className = 'flex justify-start mb-4';
+            loaderWrapper.innerHTML = `<div class="message-bubble ai p-3 rounded-lg"><div class="loader-spinner"></div></div>`;
+            chatContainer.appendChild(loaderWrapper);
+            // Auto-scrolling is disabled as per request
+        };
+
+        const hideLoadingIndicator = () => {
+            const loader = document.getElementById('ai-loader');
+            if (loader) loader.remove();
+        };
+        
+        const toggleSendStopButtons = (showStop) => {
+            sendBtn.classList.toggle('hidden', showStop);
+            stopBtn.classList.toggle('hidden', !showStop);
+        };
+
+        const callGeminiAPI = async (payload, isSilent = false) => {
+            abortController = new AbortController();
+            const signal = abortController.signal;
+            const apiKey = "AIzaSyDK9Hw3Ayug4P1L7G_aAlZG5jukoJk1mew";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), signal });
+                if (!response.ok) throw new Error(`API Error: ${response.status}`);
+                const result = await response.json();
+                if (!result.candidates || result.candidates.length === 0) {
+                    if (result.promptFeedback && result.promptFeedback.blockReason) {
+                        console.warn(`Request blocked: ${result.promptFeedback.blockReason}`);
+                        return translations[currentLang].error_message;
+                    }
+                    return translations[currentLang].error_message;
+                }
+                return result?.candidates?.[0]?.content?.parts?.[0]?.text || translations[currentLang].error_message;
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    console.log('Fetch aborted.');
+                    return 'Generation stopped.';
+                }
+                console.error("API Call Error:", error);
+                throw error;
+            }
+        };
+
+        const handleChatSubmit = async (e) => {
+            e.preventDefault();
+            const userPrompt = promptInput.value.trim();
+            if (!userPrompt && !uploadedImageBase64) return;
+
+            const imageSrcForUI = uploadedImageBase64 ? `data:image/png;base64,${uploadedImageBase64}` : null;
+            addMessageToUI(userPrompt, 'user', imageSrcForUI);
+            
+            const userParts = [{ text: userPrompt }];
+            if (uploadedImageBase64) {
+                userParts.push({ inlineData: { mimeType: "image/png", data: uploadedImageBase64 } });
+            }
+            const userMessage = { role: "user", parts: userParts };
+            
+            promptInput.value = '';
+            clearImagePreview();
+            promptInput.disabled = true;
+            toggleSendStopButtons(true);
+            showLoadingIndicator();
+
+            try {
+                const payload = { contents: [...chatHistory, userMessage], systemInstruction };
+                const finalResponse = await callGeminiAPI(payload);
+                
+                hideLoadingIndicator();
+                addMessageToUI(finalResponse, 'ai');
+                
+                chatHistory.push(userMessage, { role: "model", parts: [{ text: finalResponse }] });
+
+            } catch (error) {
+                hideLoadingIndicator();
+                addMessageToUI(`${translations[currentLang].error_message}`, 'ai');
+            } finally {
+                promptInput.disabled = false;
+                toggleSendStopButtons(false);
+                abortController = null;
+                promptInput.focus();
+            }
+        };
+
+        const handleImageUpload = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                uploadedImageBase64 = event.target.result.split(',')[1];
+                imagePreview.src = event.target.result;
+                imagePreviewContainer.classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        };
+        
+        const clearImagePreview = () => {
+             uploadedImageBase64 = null;
+             imagePreview.src = '';
+             imagePreviewContainer.classList.add('hidden');
+             imageUploadInput.value = '';
+        };
+
+        const handleSummarize = async () => {
+            summaryModal.classList.remove('hidden');
+            summaryContent.classList.add('hidden');
+            summaryLoading.classList.remove('hidden');
+
+            const conversation = chatHistory.map(item => `${item.role}: ${item.parts.map(p => p.text).join(' ')}`).join('\n');
+            const summaryPrompt = `Please provide a concise summary of the following conversation:\n\n${conversation}`;
+            const payload = { contents: [{role: 'user', parts: [{text: summaryPrompt}]}], systemInstruction };
+
+            try {
+                const summary = await callGeminiAPI(payload, true);
+                summaryContent.innerHTML = summary.replace(/\n/g, '<br>');
+            } catch (error) {
+                summaryContent.textContent = translations[currentLang].error_message;
+            } finally {
+                summaryLoading.classList.add('hidden');
+                summaryContent.classList.remove('hidden');
+                abortController = null;
+            }
+        };
+
+        const base64ToArrayBuffer = (base64) => {
+            const binaryString = atob(base64);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return bytes.buffer;
+        };
+
+        const pcmToWav = (pcmData, sampleRate) => {
+            const view = new DataView(new ArrayBuffer(44 + pcmData.byteLength));
+            writeString(view, 0, 'RIFF');
+            view.setUint32(4, 36 + pcmData.byteLength, true);
+            writeString(view, 8, 'WAVE');
+            writeString(view, 12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, 1, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * 2, true);
+            view.setUint16(32, 2, true);
+            view.setUint16(34, 16, true);
+            writeString(view, 36, 'data');
+            view.setUint32(40, pcmData.byteLength, true);
+            new Uint8Array(view.buffer, 44).set(new Uint8Array(pcmData));
+            return new Blob([view], { type: 'audio/wav' });
+        };
+
+        const writeString = (view, offset, string) => {
+            for (let i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
+            }
+        };
+        
+        const handleTTS = async (text, btn) => {
+            if (currentAudio && !currentAudio.paused) {
+                currentAudio.pause();
+                if (currentPlayingBtn) currentPlayingBtn.classList.remove('playing');
+                if (currentPlayingBtn === btn) {
+                    currentPlayingBtn = null;
+                    currentAudio = null;
+                    return;
+                }
+            }
+            
+            btn.classList.add('playing');
+            currentPlayingBtn = btn;
+
+            try {
+                const payload = {
+                    contents: [{ parts: [{ text }] }],
+                    generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } } } },
+                    model: "gemini-2.5-flash-preview-tts"
+                };
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!response.ok) throw new Error(`TTS API Error: ${response.status}`);
+                const result = await response.json();
+                const part = result?.candidates?.[0]?.content?.parts?.[0];
+                const audioData = part?.inlineData?.data;
+                const mimeType = part?.inlineData?.mimeType;
+
+                if (audioData && mimeType?.startsWith("audio/")) {
+                    const sampleRate = parseInt(mimeType.match(/rate=(\d+)/)[1], 10);
+                    const pcmData = base64ToArrayBuffer(audioData);
+                    const wavBlob = pcmToWav(pcmData, sampleRate);
+                    const audioUrl = URL.createObjectURL(wavBlob);
+                    
+                    currentAudio = new Audio(audioUrl);
+                    currentAudio.onended = () => {
+                        btn.classList.remove('playing');
+                        currentPlayingBtn = null;
+                        currentAudio = null;
+                    };
+                    currentAudio.play();
+                } else { throw new Error("Invalid audio data received."); }
+            } catch (error) {
+                console.error("TTS Error:", error);
+                btn.classList.remove('playing');
+                currentPlayingBtn = null;
+            }
+        };
+
+        const handleMicInput = () => {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) return alert("Sorry, speech recognition is not supported in this browser.");
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = currentLang === 'bn' ? 'bn-BD' : 'en-US';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+            micBtn.classList.add('listening');
+            recognition.start();
+            recognition.onresult = (event) => { promptInput.value = event.results[0][0].transcript; };
+            recognition.onspeechend = () => { recognition.stop(); micBtn.classList.remove('listening'); };
+            recognition.onerror = (event) => { console.error("Speech recognition error:", event.error); micBtn.classList.remove('listening'); };
+        };
+
+        // --- Event Listeners ---
+        langToggleBtn.addEventListener('click', () => setLanguage(currentLang === 'en' ? 'bn' : 'en'));
+        chatForm.addEventListener('submit', handleChatSubmit);
+        galleryBtn.addEventListener('click', () => imageUploadInput.click());
+        imageUploadInput.addEventListener('change', handleImageUpload);
+        removeImageBtn.addEventListener('click', clearImagePreview);
+        summarizeBtn.addEventListener('click', handleSummarize);
+        closeModalBtn.addEventListener('click', () => summaryModal.classList.add('hidden'));
+        stopBtn.addEventListener('click', () => abortController?.abort());
+        micBtn.addEventListener('click', handleMicInput);
+
+        // --- Initial Setup ---
+        setLanguage('bn');
+        // Initial welcome message needs to be set manually as it's not covered by setLanguage
+        document.querySelector('[data-lang-key="welcome_message"]').textContent = translations.bn.welcome_message;
+
+
+    </script>
+</body>
+</html>
