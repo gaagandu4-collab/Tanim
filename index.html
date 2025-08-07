@@ -147,9 +147,9 @@
     <canvas id="glcanvas"></canvas>
 
     <!-- Main Chat Application Wrapper -->
-    <div class="w-screen h-screen flex flex-col absolute top-0 left-0">
+    <div id="app-container" class="w-screen flex flex-col absolute top-0 left-0">
         <!-- Header -->
-        <header class="glass-ui p-3 flex justify-between items-center z-10 shadow-lg">
+        <header class="glass-ui px-4 py-2 flex justify-between items-center z-10 shadow-lg">
             <!-- New Animated Logo with Icon -->
             <div id="logo-container">
                 <div id="text-overlay">Tanim AI</div>
@@ -477,7 +477,7 @@
         const callGeminiAPI = async (payload, isSilent = false) => {
             abortController = new AbortController();
             const signal = abortController.signal;
-            const apiKey = "AIzaSyDK9Hw3Ayug4P1L7G_aAlZG5jukoJk1mew";
+            const apiKey = "";
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
             try {
@@ -637,7 +637,7 @@
                     generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } } } },
                     model: "gemini-2.5-flash-preview-tts"
                 };
-                const apiKey = "";
+                const apiKey = "AIzaSyDK9Hw3Ayug4P1L7G_aAlZG5jukoJk1mew";
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
                 const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 if (!response.ok) throw new Error(`TTS API Error: ${response.status}`);
@@ -681,6 +681,14 @@
             recognition.onspeechend = () => { recognition.stop(); micBtn.classList.remove('listening'); };
             recognition.onerror = (event) => { console.error("Speech recognition error:", event.error); micBtn.classList.remove('listening'); };
         };
+        
+        const setAppHeight = () => {
+            const appContainer = document.getElementById('app-container');
+            if (appContainer) {
+                appContainer.style.height = `${window.innerHeight}px`;
+            }
+        };
+
 
         // --- Event Listeners ---
         langToggleBtn.addEventListener('click', () => setLanguage(currentLang === 'en' ? 'bn' : 'en'));
@@ -692,9 +700,11 @@
         closeModalBtn.addEventListener('click', () => summaryModal.classList.add('hidden'));
         stopBtn.addEventListener('click', () => abortController?.abort());
         micBtn.addEventListener('click', handleMicInput);
+        window.addEventListener('resize', setAppHeight);
 
         // --- Initial Setup ---
         setLanguage('bn');
+        setAppHeight();
         // Initial welcome message needs to be set manually as it's not covered by setLanguage
         document.querySelector('[data-lang-key="welcome_message"]').textContent = translations.bn.welcome_message;
 
