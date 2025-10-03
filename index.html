@@ -1,34 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tanim AI</title>
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Orbitron:wght@400;700&family=Michroma&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600;700&family=Orbitron:wght@400;700&family=Michroma&display=swap" rel="stylesheet">
     
     <!-- MathJax Configuration -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script>
         window.MathJax = {
           tex: {
             inlineMath: [['$', '$'], ['\\(', '\\)']],
             displayMath: [['$$', '$$'], ['\\[', '\\]']]
-          },
-          svg: {
-            fontCache: 'global'
           }
         };
     </script>
-    <script type="text/javascript" id="MathJax-script" async
-      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+    <script id="MathJax-script" async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
     </script>
 
     <style>
@@ -48,7 +44,7 @@
             padding: 0;
             overflow: hidden;
             background: #000;
-            font-family: 'Hind Siliguri', sans-serif;
+            font-family: 'Anek Bangla', sans-serif;
             color: var(--text-main);
         }
 
@@ -59,14 +55,14 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            z-index: -1; /* Place canvas behind all other content */
+            z-index: -1;
             display: block;
         }
 
         /* Chat UI Styles */
         .font-orbitron { font-family: 'Orbitron', sans-serif; }
         .glass-ui {
-            background: rgba(var(--glass-bg-rgba), 0.5); /* Slightly more transparent */
+            background: rgba(var(--glass-bg-rgba), 0.5);
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
             border: 1px solid rgba(var(--accent-rgb), 0.2);
@@ -88,7 +84,7 @@
         #chat-container::-webkit-scrollbar-track { background: transparent; }
         #chat-container::-webkit-scrollbar-thumb { background: rgba(var(--accent-rgb), 0.4); border-radius: 3px; }
         
-        /* New Animated Logo Style */
+        /* Animated Logo Style */
         #logo-container {
             display: flex;
             align-items: center;
@@ -98,7 +94,7 @@
             position: relative;
             font-family: 'Michroma', sans-serif;
             font-weight: normal;
-            font-size: 1.75rem; /* Adjusted for header */
+            font-size: 1.75rem;
             pointer-events: none;
             background: linear-gradient(90deg, #ff00ae, #ff7300, #4d00ff, #00c8ff, #ff00ae);
             background-size: 400% 100%;
@@ -132,7 +128,7 @@
         .message-bubble.ai { background-color: #3a2505; }
         .tts-btn { cursor: pointer; opacity: 0.6; transition: opacity 0.2s; }
         .tts-btn:hover { opacity: 1; }
-        .tts-btn.playing .speaker-icon-on { display: block; }
+        .tts-btn.playing .speaker-icon-on { display: inline-block; }
         .tts-btn.playing .speaker-icon-off { display: none; }
         .tts-btn .speaker-icon-on { display: none; }
         #mic-btn.listening {
@@ -154,7 +150,6 @@
     <div id="app-container" class="w-screen flex flex-col absolute top-0 left-0">
         <!-- Header -->
         <header class="glass-ui px-4 py-2 flex justify-between items-center z-10 shadow-lg">
-            <!-- New Animated Logo with Icon -->
             <div id="logo-container">
                 <div id="text-overlay">Tanim AI</div>
                 <canvas id="logo-canvas" width="64" height="64" style="width: 2.5rem; height: 2.5rem;"></canvas>
@@ -167,7 +162,6 @@
 
         <!-- Chat Container -->
         <main id="chat-container" class="flex-1 p-4 overflow-y-auto">
-            <!-- Initial Message -->
             <div class="flex justify-start mb-4">
                 <div class="message-bubble ai text-white p-3 rounded-lg max-w-[85%] inline-block" data-lang-key="welcome_message"></div>
             </div>
@@ -220,55 +214,34 @@
         </div>
     </div>
 
-
     <script>
-        // --- WebGL Black Hole Animation Script ---
+        // --- WebGL Animation Script ---
         (function() {
             const vsSource = `attribute vec2 a_position; void main() { gl_Position = vec4(a_position, 0.0, 1.0); }`;
             const fsSource = `
                 precision mediump float;
                 uniform float t;
                 uniform vec2 r;
-
-                vec2 myTanh(vec2 x) {
-                    vec2 ex = exp(x);
-                    vec2 emx = exp(-x);
-                    return (ex - emx) / (ex + emx);
-                }
-
+                vec2 myTanh(vec2 x) { vec2 ex = exp(x); vec2 emx = exp(-x); return (ex - emx) / (ex + emx); }
                 void main() {
-                    vec4 o_bg = vec4(0.0);
-                    vec4 o_anim = vec4(0.0);
-                    // This line will be replaced for the logo canvas
-                    vec2 center_offset = vec2(r.x * 0.65, r.y * 0.5);
-
+                    vec4 o_bg = vec4(0.0); vec4 o_anim = vec4(0.0);
+                    vec2 center_offset = vec2(r.x * 0.65, r.y * 0.5); // This line is replaced for the logo
                     {
                         vec2 p_img = ((gl_FragCoord.xy - center_offset) * 2.0) / r.y;
-                        p_img.xy = vec2(p_img.y, -p_img.x);
-                        p_img *= 2.5;
-                        vec2 l_val = myTanh(p_img * 5.0 + 2.0);
-                        l_val = min(l_val, l_val * 3.0);
-                        vec2 clamped = clamp(l_val, -2.0, 0.0);
-                        float diff_y = clamped.y - l_val.y;
+                        p_img.xy = vec2(p_img.y, -p_img.x); p_img *= 2.5;
+                        vec2 l_val = myTanh(p_img * 5.0 + 2.0); l_val = min(l_val, l_val * 3.0);
+                        vec2 clamped = clamp(l_val, -2.0, 0.0); float diff_y = clamped.y - l_val.y;
                         float safe_px = abs(p_img.x) < 0.001 ? 0.001 : p_img.x;
                         float term = (0.1 - max(0.01 - dot(p_img, p_img) / 200.0, 0.0) * (diff_y / safe_px)) / abs(length(p_img) - 0.7);
-                        o_bg += vec4(term);
-                        o_bg *= max(o_bg, vec4(0.0));
+                        o_bg += vec4(term); o_bg *= max(o_bg, vec4(0.0));
                     }
-
                     {
-                        vec2 p_base = ((gl_FragCoord.xy - center_offset) * 2.0) / r.y;
-                        p_base *= 2.5;
-                        vec2 p_anim = vec2(p_base.y, -p_base.x);
-                        float angle = -400.0 * 3.14159 / 180.0;
-                        float s = sin(angle);
-                        float c_rot = cos(angle);
-                        mat2 rotMat = mat2(c_rot, -s, s, c_rot);
-                        vec2 p_effect = rotMat * p_base;
-                        vec2 d = vec2(-1.0, 1.0);
+                        vec2 p_base = ((gl_FragCoord.xy - center_offset) * 2.0) / r.y; p_base *= 2.5;
+                        vec2 p_anim = vec2(p_base.y, -p_base.x); float angle = -400.0 * 3.14159 / 180.0;
+                        float s = sin(angle); float c_rot = cos(angle); mat2 rotMat = mat2(c_rot, -s, s, c_rot);
+                        vec2 p_effect = rotMat * p_base; vec2 d = vec2(-1.0, 1.0);
                         float denom = 0.1 + 5.0 / dot(5.0 * p_effect - d, 5.0 * p_effect - d);
-                        vec2 c = p_effect * mat2(1.0, 1.0, d.x / denom, d.y / denom);
-                        vec2 v = c;
+                        vec2 c = p_effect * mat2(1.0, 1.0, d.x / denom, d.y / denom); vec2 v = c;
                         vec4 animAccum = vec4(0.0);
                         for (int i = 1; i <= 9; i++) {
                             float fi = float(i);
@@ -278,99 +251,47 @@
                         vec4 animTerm = 1.0 - exp(-exp(c.x * vec4(0.6, -0.4, -1.0, 0.0)) / animAccum / (0.1 + 0.1 * pow(length(sin(v / 0.3) * 0.2 + c * vec2(1.0, 2.0)) - 1.0, 2.0)) / (1.0 + 7.0 * exp(0.3 * c.y - dot(c, c))) / (0.03 + abs(length(p_anim) - 0.7)) * 0.2);
                         o_anim += animTerm;
                     }
-
                     vec4 finalColor = mix(o_bg, o_anim, 0.5) * 1.5;
                     finalColor = clamp(finalColor, 0.0, 1.0);
                     gl_FragColor = finalColor;
-                }
-            `;
+                }`;
             
             function setupWebGL(canvasId, isLogo) {
-                const canvas = document.getElementById(canvasId);
-                if (!canvas) return;
+                const canvas = document.getElementById(canvasId); if (!canvas) return;
                 const gl = canvas.getContext('webgl');
                 if (!gl) {
                     console.error(`WebGL not supported for canvas: ${canvasId}`);
-                    if (!isLogo) {
-                        document.body.style.backgroundColor = '#1F1301';
-                        canvas.style.display = 'none';
-                    }
+                    if (!isLogo) { document.body.style.backgroundColor = '#1F1301'; canvas.style.display = 'none'; }
                     return;
                 }
-
                 let finalFsSource = fsSource;
                 if (isLogo) {
-                    finalFsSource = fsSource.replace(
-                        'vec2 center_offset = vec2(r.x * 0.65, r.y * 0.5);',
-                        'vec2 center_offset = vec2(r.x * 0.5, r.y * 0.5);'
-                    );
+                    finalFsSource = fsSource.replace('vec2 center_offset = vec2(r.x * 0.65, r.y * 0.5);', 'vec2 center_offset = vec2(r.x * 0.5, r.y * 0.5);');
                 }
-
                 const program = createProgram(gl, createShader(gl, gl.VERTEX_SHADER, vsSource), createShader(gl, gl.FRAGMENT_SHADER, finalFsSource));
                 if (!program) return;
                 gl.useProgram(program);
-
                 const positionLocation = gl.getAttribLocation(program, 'a_position');
                 const timeLocation = gl.getUniformLocation(program, 't');
                 const resolutionLocation = gl.getUniformLocation(program, 'r');
-
                 const vertices = new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]);
                 const buffer = gl.createBuffer();
                 gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
                 gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
                 gl.enableVertexAttribArray(positionLocation);
                 gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
-
-                function resize() {
-                    canvas.width = window.innerWidth;
-                    canvas.height = window.innerHeight;
-                    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-                }
-
-                if (!isLogo) {
-                    window.addEventListener('resize', resize);
-                    resize();
-                } else {
-                    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-                }
-
+                function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight); }
+                if (!isLogo) { window.addEventListener('resize', resize); resize(); } else { gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight); }
                 let startTime = performance.now();
                 function render() {
-                    let currentTime = performance.now();
-                    let delta = (currentTime - startTime) / 1000;
-                    gl.uniform1f(timeLocation, delta);
-                    gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
-                    gl.drawArrays(gl.TRIANGLES, 0, 6);
-                    requestAnimationFrame(render);
+                    let currentTime = performance.now(); let delta = (currentTime - startTime) / 1000;
+                    gl.uniform1f(timeLocation, delta); gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
+                    gl.drawArrays(gl.TRIANGLES, 0, 6); requestAnimationFrame(render);
                 }
                 requestAnimationFrame(render);
             }
-
-            function createShader(gl, type, source) {
-                const shader = gl.createShader(type);
-                gl.shaderSource(shader, source);
-                gl.compileShader(shader);
-                if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-                    console.error('Shader compile error: ' + gl.getShaderInfoLog(shader));
-                    gl.deleteShader(shader); return null;
-                }
-                return shader;
-            }
-
-            function createProgram(gl, vertexShader, fragmentShader) {
-                if (!vertexShader || !fragmentShader) return null;
-                const program = gl.createProgram();
-                gl.attachShader(program, vertexShader);
-                gl.attachShader(program, fragmentShader);
-                gl.linkProgram(program);
-                if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-                    console.error('Program link error: ' + gl.getProgramInfoLog(program));
-                    gl.deleteProgram(program); return null;
-                }
-                return program;
-            }
-
-            // Initialize both canvases
+            function createShader(gl, type, source) { const shader = gl.createShader(type); gl.shaderSource(shader, source); gl.compileShader(shader); if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) { console.error('Shader compile error: ' + gl.getShaderInfoLog(shader)); gl.deleteShader(shader); return null; } return shader; }
+            function createProgram(gl, vs, fs) { if (!vs || !fs) return null; const program = gl.createProgram(); gl.attachShader(program, vs); gl.attachShader(program, fs); gl.linkProgram(program); if (!gl.getProgramParameter(program, gl.LINK_STATUS)) { console.error('Program link error: ' + gl.getProgramInfoLog(program)); gl.deleteProgram(program); return null; } return program; }
             setupWebGL('glcanvas', false);
             setupWebGL('logo-canvas', true);
         })();
@@ -427,36 +348,37 @@
             const wrapper = document.createElement('div');
             wrapper.className = `flex mb-4 ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
             
-            const bubble = document.createElement('div');
-            // Using 'inline-block' to make the bubble width fit its content
-            bubble.className = `message-bubble ${sender} p-3 rounded-lg max-w-[85%] inline-block`;
-
+            const contentWrapper = document.createElement('div');
+            contentWrapper.className = `message-bubble ${sender} p-3 rounded-lg max-w-[85%] inline-block`;
+            
             if (imageSrc) {
                 const img = document.createElement('img');
                 img.src = imageSrc;
                 img.className = 'rounded-md mb-2 max-w-full h-auto';
-                bubble.appendChild(img);
+                contentWrapper.appendChild(img);
             }
             
-            const textElement = document.createElement('div');
-            textElement.innerHTML = text.replace(/\n/g, '<br>');
-            bubble.appendChild(textElement);
-
+            if (text) {
+                const textElement = document.createElement('div');
+                textElement.innerHTML = text.replace(/\n/g, '<br>');
+                contentWrapper.appendChild(textElement);
+            }
+            
             if (sender === 'ai') {
                 const ttsBtn = document.createElement('button');
                 ttsBtn.className = 'tts-btn ml-2 align-middle inline-block';
                 ttsBtn.innerHTML = `<svg class="speaker-icon-off" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M11.536 14.01A8.473 8.473 0 0 0 14.026 8a8.473 8.473 0 0 0-2.49-6.01l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707z"/><path d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.483 5.483 0 0 1 11.025 8a5.483 5.483 0 0 1-1.61 3.89l.706.706z"/><path d="M8.707 11.182A4.486 4.486 0 0 0 10.025 8a4.486 4.486 0 0 0-1.318-3.182L8 5.525A3.489 3.489 0 0 1 9.025 8 3.49 3.49 0 0 1 8 10.475l.707.707zM6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.063-1.89a.5.5 0 0 1 .829-.06z"/></svg><svg class="speaker-icon-on" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M11.536 14.01A8.473 8.473 0 0 0 14.026 8a8.473 8.473 0 0 0-2.49-6.01l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707zm-1.414-.707A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.483 5.483 0 0 1 11.025 8a5.483 5.483 0 0 1-1.61 3.89l.706.706zm-1.414-.707A4.486 4.486 0 0 0 10.025 8a4.486 4.486 0 0 0-1.318-3.182L8 5.525A3.489 3.489 0 0 1 9.025 8 3.49 3.49 0 0 1 8 10.475l.707.707zM6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.063-1.89a.5.5 0 0 1 .829-.06z"/></svg>`;
                 ttsBtn.onclick = () => handleTTS(text, ttsBtn);
-                bubble.appendChild(ttsBtn);
+                contentWrapper.appendChild(ttsBtn);
             }
             
-            wrapper.appendChild(bubble);
+            wrapper.appendChild(contentWrapper);
             chatContainer.appendChild(wrapper);
             
             if (sender === 'ai' && window.MathJax) {
-                MathJax.typesetPromise([bubble]);
+                MathJax.typesetPromise([contentWrapper]);
             }
-            // Auto-scrolling is disabled as per request
+            // chatContainer.scrollTop = chatContainer.scrollHeight; // Removed auto-scroll
         };
 
         const showLoadingIndicator = () => {
@@ -465,7 +387,7 @@
             loaderWrapper.className = 'flex justify-start mb-4';
             loaderWrapper.innerHTML = `<div class="message-bubble ai p-3 rounded-lg"><div class="loader-spinner"></div></div>`;
             chatContainer.appendChild(loaderWrapper);
-            // Auto-scrolling is disabled as per request
+            // chatContainer.scrollTop = chatContainer.scrollHeight; // Removed auto-scroll
         };
 
         const hideLoadingIndicator = () => {
@@ -478,10 +400,10 @@
             stopBtn.classList.toggle('hidden', !showStop);
         };
 
-        const callGeminiAPI = async (payload, isSilent = false) => {
+        const callGeminiAPI = async (payload) => {
             abortController = new AbortController();
             const signal = abortController.signal;
-            const apiKey = "AIzaSyD4DUPrsyPdb0TZG0dscPZwkWLFoVzCBdk";
+            const apiKey = "AIzaSyBmzEF77kCL3pE0nxkHT6ODj8lyRMrWIgc"; // Environment will provide this
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
             try {
@@ -491,16 +413,13 @@
                 if (!result.candidates || result.candidates.length === 0) {
                     if (result.promptFeedback && result.promptFeedback.blockReason) {
                         console.warn(`Request blocked: ${result.promptFeedback.blockReason}`);
-                        return translations[currentLang].error_message;
+                        return `দুঃখিত, আপনার অনুরোধটি ব্লক করা হয়েছে (${result.promptFeedback.blockReason})।`;
                     }
                     return translations[currentLang].error_message;
                 }
                 return result?.candidates?.[0]?.content?.parts?.[0]?.text || translations[currentLang].error_message;
             } catch (error) {
-                if (error.name === 'AbortError') {
-                    console.log('Fetch aborted.');
-                    return 'Generation stopped.';
-                }
+                if (error.name === 'AbortError') { return 'Generation stopped.'; }
                 console.error("API Call Error:", error);
                 throw error;
             }
@@ -571,7 +490,7 @@
             summaryLoading.classList.remove('hidden');
 
             const conversation = chatHistory.map(item => `${item.role}: ${item.parts.map(p => p.text).join(' ')}`).join('\n');
-            const summaryPrompt = `Please provide a concise summary of the following conversation:\n\n${conversation}`;
+            const summaryPrompt = `Please provide a concise summary in ${currentLang === 'bn' ? 'Bengali' : 'English'} of the following conversation:\n\n${conversation}`;
             const payload = { contents: [{role: 'user', parts: [{text: summaryPrompt}]}], systemInstruction };
 
             try {
@@ -586,50 +505,17 @@
             }
         };
 
-        const base64ToArrayBuffer = (base64) => {
-            const binaryString = atob(base64);
-            const len = binaryString.length;
-            const bytes = new Uint8Array(len);
-            for (let i = 0; i < len; i++) {
-                bytes[i] = binaryString.charCodeAt(i);
-            }
-            return bytes.buffer;
-        };
+        // --- TTS Helper Functions ---
+        const base64ToArrayBuffer = (base64) => { const binaryString = atob(base64); const len = binaryString.length; const bytes = new Uint8Array(len); for (let i = 0; i < len; i++) { bytes[i] = binaryString.charCodeAt(i); } return bytes.buffer; };
+        const writeString = (view, offset, string) => { for (let i = 0; i < string.length; i++) { view.setUint8(offset + i, string.charCodeAt(i)); } };
+        const pcmToWav = (pcmData, sampleRate) => { const buffer = new ArrayBuffer(44 + pcmData.byteLength); const view = new DataView(buffer); writeString(view, 0, 'RIFF'); view.setUint32(4, 36 + pcmData.byteLength, true); writeString(view, 8, 'WAVE'); writeString(view, 12, 'fmt '); view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, 1, true); view.setUint32(24, sampleRate, true); view.setUint32(28, sampleRate * 2, true); view.setUint16(32, 2, true); view.setUint16(34, 16, true); writeString(view, 36, 'data'); view.setUint32(40, pcmData.byteLength, true); const pcmAsUint8 = new Uint8Array(pcmData.buffer, pcmData.byteOffset, pcmData.byteLength); new Uint8Array(view.buffer, 44).set(pcmAsUint8); return new Blob([view], { type: 'audio/wav' }); };
 
-        const pcmToWav = (pcmData, sampleRate) => {
-            const view = new DataView(new ArrayBuffer(44 + pcmData.byteLength));
-            writeString(view, 0, 'RIFF');
-            view.setUint32(4, 36 + pcmData.byteLength, true);
-            writeString(view, 8, 'WAVE');
-            writeString(view, 12, 'fmt ');
-            view.setUint32(16, 16, true);
-            view.setUint16(20, 1, true);
-            view.setUint16(22, 1, true);
-            view.setUint32(24, sampleRate, true);
-            view.setUint32(28, sampleRate * 2, true);
-            view.setUint16(32, 2, true);
-            view.setUint16(34, 16, true);
-            writeString(view, 36, 'data');
-            view.setUint32(40, pcmData.byteLength, true);
-            new Uint8Array(view.buffer, 44).set(new Uint8Array(pcmData));
-            return new Blob([view], { type: 'audio/wav' });
-        };
 
-        const writeString = (view, offset, string) => {
-            for (let i = 0; i < string.length; i++) {
-                view.setUint8(offset + i, string.charCodeAt(i));
-            }
-        };
-        
         const handleTTS = async (text, btn) => {
             if (currentAudio && !currentAudio.paused) {
                 currentAudio.pause();
                 if (currentPlayingBtn) currentPlayingBtn.classList.remove('playing');
-                if (currentPlayingBtn === btn) {
-                    currentPlayingBtn = null;
-                    currentAudio = null;
-                    return;
-                }
+                if (currentPlayingBtn === btn) { currentPlayingBtn = null; currentAudio = null; return; }
             }
             
             btn.classList.add('playing');
@@ -637,7 +523,7 @@
 
             try {
                 const payload = {
-                    contents: [{ parts: [{ text }] }],
+                    contents: [{ parts: [{ text: `Say in a natural and clear voice: ${text}` }] }],
                     generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } } } },
                     model: "gemini-2.5-flash-preview-tts"
                 };
@@ -652,16 +538,13 @@
 
                 if (audioData && mimeType?.startsWith("audio/")) {
                     const sampleRate = parseInt(mimeType.match(/rate=(\d+)/)[1], 10);
-                    const pcmData = base64ToArrayBuffer(audioData);
-                    const wavBlob = pcmToWav(pcmData, sampleRate);
+                    const pcmBuffer = base64ToArrayBuffer(audioData);
+                    const pcm16 = new Int16Array(pcmBuffer);
+                    const wavBlob = pcmToWav(pcm16, sampleRate);
                     const audioUrl = URL.createObjectURL(wavBlob);
                     
                     currentAudio = new Audio(audioUrl);
-                    currentAudio.onended = () => {
-                        btn.classList.remove('playing');
-                        currentPlayingBtn = null;
-                        currentAudio = null;
-                    };
+                    currentAudio.onended = () => { btn.classList.remove('playing'); currentPlayingBtn = null; currentAudio = null; };
                     currentAudio.play();
                 } else { throw new Error("Invalid audio data received."); }
             } catch (error) {
@@ -687,12 +570,8 @@
         };
         
         const setAppHeight = () => {
-            const appContainer = document.getElementById('app-container');
-            if (appContainer) {
-                appContainer.style.height = `${window.innerHeight}px`;
-            }
+            document.getElementById('app-container').style.height = `${window.innerHeight}px`;
         };
-
 
         // --- Event Listeners ---
         langToggleBtn.addEventListener('click', () => setLanguage(currentLang === 'en' ? 'bn' : 'en'));
@@ -709,10 +588,9 @@
         // --- Initial Setup ---
         setLanguage('bn');
         setAppHeight();
-        // Initial welcome message needs to be set manually as it's not covered by setLanguage
         document.querySelector('[data-lang-key="welcome_message"]').textContent = translations.bn.welcome_message;
-
 
     </script>
 </body>
 </html>
+
