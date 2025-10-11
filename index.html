@@ -139,6 +139,17 @@
             70% { box-shadow: 0 0 0 10px rgba(var(--accent-rgb), 0); }
             100% { box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0); }
         }
+        /* New styles for the search button */
+        #search-toggle-btn.search-active {
+            background: rgba(var(--accent-rgb), 0.25);
+            border-color: rgba(var(--accent-rgb), 0.8);
+            box-shadow: 0 0 18px rgba(var(--accent-rgb), 0.45);
+            color: white;
+        }
+        /* Update poster checkbox */
+        #dont-show-again {
+            accent-color: var(--accent-color);
+        }
     </style>
 </head>
 <body class="overflow-hidden">
@@ -154,8 +165,8 @@
                 <div id="text-overlay">Tanim AI</div>
                 <canvas id="logo-canvas" width="64" height="64" style="width: 2.5rem; height: 2.5rem;"></canvas>
             </div>
-            <div>
-                <button id="summarize-btn" class="glass-btn rounded-md px-3 py-1 text-sm font-semibold mr-2" data-lang-key="summarize_btn"></button>
+            <div class="flex items-center gap-2">
+                <button id="summarize-btn" class="glass-btn rounded-md px-3 py-1 text-sm font-semibold" data-lang-key="summarize_btn"></button>
                 <button id="lang-toggle-btn" class="glass-btn rounded-md px-3 py-1 text-sm font-semibold"></button>
             </div>
         </header>
@@ -182,7 +193,17 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/></svg>
                 </button>
                 <input type="file" id="image-upload-input" class="hidden" accept="image/*">
-                <input type="text" id="prompt-input" class="w-full px-4 py-2 bg-black/30 border rounded-full focus:outline-none focus:ring-2 text-white transition" style="border-color: var(--accent-dark); --tw-ring-color: var(--accent-color);" data-lang-key="placeholder">
+                
+                <!-- Input field with integrated search button -->
+                <div class="relative w-full flex items-center">
+                    <input type="text" id="prompt-input" class="w-full pl-12 pr-4 py-2 bg-black/30 border rounded-full focus:outline-none focus:ring-2 text-white transition" style="border-color: var(--accent-dark); --tw-ring-color: var(--accent-color);" data-lang-key="placeholder">
+                    <button type="button" id="search-toggle-btn" class="absolute left-3 glass-btn rounded-full p-1.5" title="Toggle Web Search">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                          <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                        </svg>
+                    </button>
+                </div>
+
                 <button type="submit" id="send-btn" class="text-black font-bold p-2.5 rounded-full shadow-lg transform hover:scale-105 transition flex-shrink-0" style="background-color: var(--accent-color);">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z"/></svg>
                 </button>
@@ -213,6 +234,19 @@
             </div>
         </div>
     </div>
+
+    <!-- Update Poster Modal -->
+    <div id="update-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+        <div class="glass-ui rounded-lg p-4 max-w-sm w-full text-center relative">
+            <img src="https://file-stream-bot-bjom.onrender.com/dl/554?code=6c57de9e" alt="Update Poster" class="w-full h-auto rounded-md mb-4">
+            <div class="flex items-center justify-center mb-4">
+                <input type="checkbox" id="dont-show-again" class="w-4 h-4">
+                <label for="dont-show-again" class="ml-2 text-sm text-gray-300">Don't show again</label>
+            </div>
+            <button id="close-update-modal-btn" class="w-full text-black font-bold py-2 px-4 rounded-full transition" style="background-color: var(--accent-color);">Close</button>
+        </div>
+    </div>
+
 
     <script>
         // --- WebGL Animation Script ---
@@ -314,8 +348,13 @@
         const closeModalBtn = document.getElementById('close-modal-btn');
         const summaryContent = document.getElementById('summary-content');
         const summaryLoading = document.getElementById('summary-loading');
+        const searchToggleBtn = document.getElementById('search-toggle-btn');
+        const updateModal = document.getElementById('update-modal');
+        const closeUpdateModalBtn = document.getElementById('close-update-modal-btn');
+        const dontShowAgainCheckbox = document.getElementById('dont-show-again');
 
         let currentLang = 'bn';
+        let isSearchEnabled = false; 
         let uploadedImageBase64 = null;
         let currentAudio = null;
         let currentPlayingBtn = null;
@@ -364,7 +403,7 @@
                 contentWrapper.appendChild(textElement);
             }
             
-            if (sender === 'ai') {
+            if (sender === 'ai' && text) {
                 const ttsBtn = document.createElement('button');
                 ttsBtn.className = 'tts-btn ml-2 align-middle inline-block';
                 ttsBtn.innerHTML = `<svg class="speaker-icon-off" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M11.536 14.01A8.473 8.473 0 0 0 14.026 8a8.473 8.473 0 0 0-2.49-6.01l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707z"/><path d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.483 5.483 0 0 1 11.025 8a5.483 5.483 0 0 1-1.61 3.89l.706.706z"/><path d="M8.707 11.182A4.486 4.486 0 0 0 10.025 8a4.486 4.486 0 0 0-1.318-3.182L8 5.525A3.489 3.489 0 0 1 9.025 8 3.49 3.49 0 0 1 8 10.475l.707.707zM6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.063-1.89a.5.5 0 0 1 .829-.06z"/></svg><svg class="speaker-icon-on" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M11.536 14.01A8.473 8.473 0 0 0 14.026 8a8.473 8.473 0 0 0-2.49-6.01l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707zm-1.414-.707A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.483 5.483 0 0 1 11.025 8a5.483 5.483 0 0 1-1.61 3.89l.706.706zm-1.414-.707A4.486 4.486 0 0 0 10.025 8a4.486 4.486 0 0 0-1.318-3.182L8 5.525A3.489 3.489 0 0 1 9.025 8 3.49 3.49 0 0 1 8 10.475l.707.707zM6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.063-1.89a.5.5 0 0 1 .829-.06z"/></svg>`;
@@ -378,7 +417,7 @@
             if (sender === 'ai' && window.MathJax) {
                 MathJax.typesetPromise([contentWrapper]);
             }
-            // chatContainer.scrollTop = chatContainer.scrollHeight; // Removed auto-scroll
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         };
 
         const showLoadingIndicator = () => {
@@ -387,7 +426,7 @@
             loaderWrapper.className = 'flex justify-start mb-4';
             loaderWrapper.innerHTML = `<div class="message-bubble ai p-3 rounded-lg"><div class="loader-spinner"></div></div>`;
             chatContainer.appendChild(loaderWrapper);
-            // chatContainer.scrollTop = chatContainer.scrollHeight; // Removed auto-scroll
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         };
 
         const hideLoadingIndicator = () => {
@@ -403,8 +442,13 @@
         const callGeminiAPI = async (payload) => {
             abortController = new AbortController();
             const signal = abortController.signal;
-            const apiKey = "AIzaSyB0oAGCxTyGE_K5u4g5cI7nXiUxfxBy8Ag"; // Environment will provide this
+            const apiKey = ""; // Environment will provide this
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+            // Add search tool to payload if enabled
+            if (isSearchEnabled) {
+                payload.tools = [{ "google_search": {} }];
+            }
 
             try {
                 const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), signal });
@@ -491,17 +535,28 @@
 
             const conversation = chatHistory.map(item => `${item.role}: ${item.parts.map(p => p.text).join(' ')}`).join('\n');
             const summaryPrompt = `Please provide a concise summary in ${currentLang === 'bn' ? 'Bengali' : 'English'} of the following conversation:\n\n${conversation}`;
+            // NOTE: Summarization will not use the web search tool.
             const payload = { contents: [{role: 'user', parts: [{text: summaryPrompt}]}], systemInstruction };
 
             try {
-                const summary = await callGeminiAPI(payload, true);
+                // Manually create a new controller for summarize as it's a separate flow
+                const summaryAbortController = new AbortController();
+                const signal = summaryAbortController.signal;
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), signal });
+                if (!response.ok) throw new Error(`API Error: ${response.status}`);
+                const result = await response.json();
+                const summary = result?.candidates?.[0]?.content?.parts?.[0]?.text || translations[currentLang].error_message;
+
                 summaryContent.innerHTML = summary.replace(/\n/g, '<br>');
             } catch (error) {
+                console.error("Summarize Error:", error);
                 summaryContent.textContent = translations[currentLang].error_message;
             } finally {
                 summaryLoading.classList.add('hidden');
                 summaryContent.classList.remove('hidden');
-                abortController = null;
             }
         };
 
@@ -528,7 +583,7 @@
                     model: "gemini-2.5-flash-preview-tts"
                 };
                 const apiKey = "AIzaSyB0oAGCxTyGE_K5u4g5cI7nXiUxfxBy8Ag";
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
+                const apiUrl = `https://generativelanguage.googleapis.com///:generateContent?key=${apiKey}`;
                 const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 if (!response.ok) throw new Error(`TTS API Error: ${response.status}`);
                 const result = await response.json();
@@ -572,6 +627,11 @@
         const setAppHeight = () => {
             document.getElementById('app-container').style.height = `${window.innerHeight}px`;
         };
+        
+        const handleSearchToggle = () => {
+            isSearchEnabled = !isSearchEnabled;
+            searchToggleBtn.classList.toggle('search-active', isSearchEnabled);
+        };
 
         // --- Event Listeners ---
         langToggleBtn.addEventListener('click', () => setLanguage(currentLang === 'en' ? 'bn' : 'en'));
@@ -583,12 +643,27 @@
         closeModalBtn.addEventListener('click', () => summaryModal.classList.add('hidden'));
         stopBtn.addEventListener('click', () => abortController?.abort());
         micBtn.addEventListener('click', handleMicInput);
+        searchToggleBtn.addEventListener('click', handleSearchToggle); 
+        
+        closeUpdateModalBtn.addEventListener('click', () => {
+            if (dontShowAgainCheckbox.checked) {
+                localStorage.setItem('hideUpdateModal', 'true');
+            }
+            updateModal.classList.add('hidden');
+        });
+        
         window.addEventListener('resize', setAppHeight);
 
         // --- Initial Setup ---
         setLanguage('bn');
         setAppHeight();
         document.querySelector('[data-lang-key="welcome_message"]').textContent = translations.bn.welcome_message;
+
+        // Show update modal on load if not disabled
+        const hideModal = localStorage.getItem('hideUpdateModal');
+        if (hideModal !== 'true') {
+            updateModal.classList.remove('hidden');
+        }
 
     </script>
 </body>
