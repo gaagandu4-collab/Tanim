@@ -37,93 +37,21 @@
             --text-main: #f0f0f0;
             --text-dark: #1F1301;
         }
-
-        /* General Body and Background Styles */
-        html, body {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            background: #000;
-            font-family: 'Anek Bangla', sans-serif;
-            color: var(--text-main);
-        }
-
-        /* Canvas for WebGL background */
-        #glcanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -1;
-            display: block;
-        }
-
-        /* Chat UI Styles */
+        html, body { margin: 0; padding: 0; overflow: hidden; background: #000; font-family: 'Anek Bangla', sans-serif; color: var(--text-main); }
+        #glcanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; display: block; }
         .font-orbitron { font-family: 'Orbitron', sans-serif; }
-        .glass-ui {
-            background: rgba(var(--glass-bg-rgba), 0.5);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            border: 1px solid rgba(var(--accent-rgb), 0.2);
-        }
-        .glass-btn {
-            background: rgba(var(--accent-rgb), 0.1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(var(--accent-rgb), 0.3);
-            transition: all 0.3s ease;
-            color: var(--accent-color);
-        }
-        .glass-btn:hover {
-            background: rgba(var(--accent-rgb), 0.2);
-            border-color: rgba(var(--accent-rgb), 0.6);
-            box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.25);
-        }
+        .glass-ui { background: rgba(var(--glass-bg-rgba), 0.5); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid rgba(var(--accent-rgb), 0.2); }
+        .glass-btn { background: rgba(var(--accent-rgb), 0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(var(--accent-rgb), 0.3); transition: all 0.3s ease; color: var(--accent-color); }
+        .glass-btn:hover { background: rgba(var(--accent-rgb), 0.2); border-color: rgba(var(--accent-rgb), 0.6); box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.25); }
         #chat-container::-webkit-scrollbar { width: 6px; }
         #chat-container::-webkit-scrollbar-track { background: transparent; }
         #chat-container::-webkit-scrollbar-thumb { background: rgba(var(--accent-rgb), 0.4); border-radius: 3px; }
-        
-        /* Animated Logo Style */
-        #logo-container {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem; /* 12px */
-        }
-        #text-overlay {
-            position: relative;
-            font-family: 'Michroma', sans-serif;
-            font-weight: normal;
-            font-size: 1.75rem;
-            pointer-events: none;
-            background: linear-gradient(90deg, #ff00ae, #ff7300, #4d00ff, #00c8ff, #ff00ae);
-            background-size: 400% 100%;
-            animation: mix-colors 8s linear infinite;
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        @keyframes mix-colors {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 400% 50%; }
-        }
-
-        /* Other UI element styles */
-        .loader-spinner {
-            width: 18px; height: 18px;
-            border-radius: 50%;
-            border: 2px solid var(--accent-color);
-            border-color: var(--accent-color) transparent var(--accent-color) transparent;
-            animation: spin 1.2s linear infinite;
-        }
+        #logo-container { display: flex; align-items: center; gap: 0.75rem; }
+        #text-overlay { position: relative; font-family: 'Michroma', sans-serif; font-weight: normal; font-size: 1.75rem; pointer-events: none; background: linear-gradient(90deg, #ff00ae, #ff7300, #4d00ff, #00c8ff, #ff00ae); background-size: 400% 100%; animation: mix-colors 8s linear infinite; -webkit-background-clip: text; background-clip: text; color: transparent; }
+        @keyframes mix-colors { 0% { background-position: 0% 50%; } 100% { background-position: 400% 50%; } }
+        .loader-spinner { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--accent-color); border-color: var(--accent-color) transparent var(--accent-color) transparent; animation: spin 1.2s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .message-bubble {
-            overflow-wrap: break-word;
-            word-wrap: break-word;
-            word-break: break-word;
-            white-space: pre-wrap;
-        }
+        .message-bubble { overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; white-space: pre-wrap; }
         .message-bubble.user { background-color: #5A3908; }
         .message-bubble.ai { background-color: #3a2505; }
         .tts-btn { cursor: pointer; opacity: 0.6; transition: opacity 0.2s; }
@@ -131,35 +59,17 @@
         .tts-btn.playing .speaker-icon-on { display: inline-block; }
         .tts-btn.playing .speaker-icon-off { display: none; }
         .tts-btn .speaker-icon-on { display: none; }
-        #mic-btn.listening {
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(var(--accent-rgb), 0); }
-            100% { box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0); }
-        }
-        /* New styles for the search button */
-        #search-toggle-btn.search-active {
-            background: rgba(var(--accent-rgb), 0.25);
-            border-color: rgba(var(--accent-rgb), 0.8);
-            box-shadow: 0 0 18px rgba(var(--accent-rgb), 0.45);
-            color: white;
-        }
-        /* Update poster checkbox */
-        #dont-show-again {
-            accent-color: var(--accent-color);
-        }
+        #mic-btn.listening { animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0.7); } 70% { box-shadow: 0 0 0 10px rgba(var(--accent-rgb), 0); } 100% { box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0); } }
+        #search-toggle-btn.search-active { background: rgba(var(--accent-rgb), 0.25); border-color: rgba(var(--accent-rgb), 0.8); box-shadow: 0 0 18px rgba(var(--accent-rgb), 0.45); color: white; }
+        #dont-show-again { accent-color: var(--accent-color); }
     </style>
 </head>
 <body class="overflow-hidden">
 
-    <!-- Canvas for the WebGL animation -->
     <canvas id="glcanvas"></canvas>
 
-    <!-- Main Chat Application Wrapper -->
     <div id="app-container" class="w-screen flex flex-col absolute top-0 left-0">
-        <!-- Header -->
         <header class="glass-ui px-4 py-2 flex justify-between items-center z-10 shadow-lg">
             <div id="logo-container">
                 <div id="text-overlay">Tanim AI</div>
@@ -171,14 +81,12 @@
             </div>
         </header>
 
-        <!-- Chat Container -->
         <main id="chat-container" class="flex-1 p-4 overflow-y-auto">
             <div class="flex justify-start mb-4">
                 <div class="message-bubble ai text-white p-3 rounded-lg max-w-[85%] inline-block" data-lang-key="welcome_message"></div>
             </div>
         </main>
 
-        <!-- Image Preview Area -->
         <div id="image-preview-container" class="hidden p-2 px-4 glass-ui z-10">
              <div class="relative inline-block">
                 <img id="image-preview" src="" class="h-20 w-20 object-cover rounded-md" style="border: 1px solid var(--accent-dark);">
@@ -186,7 +94,6 @@
             </div>
         </div>
 
-        <!-- Input Area -->
         <footer class="p-4 glass-ui z-10">
             <form id="chat-form" class="flex items-center gap-3">
                 <button type="button" id="gallery-btn" class="glass-btn p-2.5 rounded-full flex-shrink-0" title="Upload Image">
@@ -194,7 +101,6 @@
                 </button>
                 <input type="file" id="image-upload-input" class="hidden" accept="image/*">
                 
-                <!-- Input field with integrated search button -->
                 <div class="relative w-full flex items-center">
                     <input type="text" id="prompt-input" class="w-full pl-12 pr-4 py-2 bg-black/30 border rounded-full focus:outline-none focus:ring-2 text-white transition" style="border-color: var(--accent-dark); --tw-ring-color: var(--accent-color);" data-lang-key="placeholder">
                     <button type="button" id="search-toggle-btn" class="absolute left-3 glass-btn rounded-full p-1.5" title="Toggle Web Search">
@@ -220,7 +126,6 @@
         </footer>
     </div>
     
-    <!-- Summary Modal -->
     <div id="summary-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
         <div class="glass-ui rounded-lg p-6 max-w-2xl w-full max-h-[80vh] flex flex-col">
             <div class="flex justify-between items-center mb-4">
@@ -235,7 +140,6 @@
         </div>
     </div>
 
-    <!-- Update Poster Modal -->
     <div id="update-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
         <div class="glass-ui rounded-lg p-4 max-w-sm w-full text-center relative">
             <img src="https://file-stream-bot-bjom.onrender.com/dl/554?code=6c57de9e" alt="Update Poster" class="w-full h-auto rounded-md mb-4">
@@ -249,255 +153,72 @@
 
 
     <script>
-        // --- WebGL Animation Script ---
-        (function() {
-            const vsSource = `attribute vec2 a_position; void main() { gl_Position = vec4(a_position, 0.0, 1.0); }`;
-            const fsSource = `
-                precision mediump float;
-                uniform float t;
-                uniform vec2 r;
-                vec2 myTanh(vec2 x) { vec2 ex = exp(x); vec2 emx = exp(-x); return (ex - emx) / (ex + emx); }
-                void main() {
-                    vec4 o_bg = vec4(0.0); vec4 o_anim = vec4(0.0);
-                    vec2 center_offset = vec2(r.x * 0.65, r.y * 0.5); // This line is replaced for the logo
-                    {
-                        vec2 p_img = ((gl_FragCoord.xy - center_offset) * 2.0) / r.y;
-                        p_img.xy = vec2(p_img.y, -p_img.x); p_img *= 2.5;
-                        vec2 l_val = myTanh(p_img * 5.0 + 2.0); l_val = min(l_val, l_val * 3.0);
-                        vec2 clamped = clamp(l_val, -2.0, 0.0); float diff_y = clamped.y - l_val.y;
-                        float safe_px = abs(p_img.x) < 0.001 ? 0.001 : p_img.x;
-                        float term = (0.1 - max(0.01 - dot(p_img, p_img) / 200.0, 0.0) * (diff_y / safe_px)) / abs(length(p_img) - 0.7);
-                        o_bg += vec4(term); o_bg *= max(o_bg, vec4(0.0));
-                    }
-                    {
-                        vec2 p_base = ((gl_FragCoord.xy - center_offset) * 2.0) / r.y; p_base *= 2.5;
-                        vec2 p_anim = vec2(p_base.y, -p_base.x); float angle = -400.0 * 3.14159 / 180.0;
-                        float s = sin(angle); float c_rot = cos(angle); mat2 rotMat = mat2(c_rot, -s, s, c_rot);
-                        vec2 p_effect = rotMat * p_base; vec2 d = vec2(-1.0, 1.0);
-                        float denom = 0.1 + 5.0 / dot(5.0 * p_effect - d, 5.0 * p_effect - d);
-                        vec2 c = p_effect * mat2(1.0, 1.0, d.x / denom, d.y / denom); vec2 v = c;
-                        vec4 animAccum = vec4(0.0);
-                        for (int i = 1; i <= 9; i++) {
-                            float fi = float(i);
-                            animAccum += sin(vec4(v.x, v.y, v.y, v.x)) + vec4(1.0);
-                            v += 0.7 * sin(vec2(v.y, v.x) * fi + t) / fi + 0.5;
-                        }
-                        vec4 animTerm = 1.0 - exp(-exp(c.x * vec4(0.6, -0.4, -1.0, 0.0)) / animAccum / (0.1 + 0.1 * pow(length(sin(v / 0.3) * 0.2 + c * vec2(1.0, 2.0)) - 1.0, 2.0)) / (1.0 + 7.0 * exp(0.3 * c.y - dot(c, c))) / (0.03 + abs(length(p_anim) - 0.7)) * 0.2);
-                        o_anim += animTerm;
-                    }
-                    vec4 finalColor = mix(o_bg, o_anim, 0.5) * 1.5;
-                    finalColor = clamp(finalColor, 0.0, 1.0);
-                    gl_FragColor = finalColor;
-                }`;
-            
-            function setupWebGL(canvasId, isLogo) {
-                const canvas = document.getElementById(canvasId); if (!canvas) return;
-                const gl = canvas.getContext('webgl');
-                if (!gl) {
-                    console.error(`WebGL not supported for canvas: ${canvasId}`);
-                    if (!isLogo) { document.body.style.backgroundColor = '#1F1301'; canvas.style.display = 'none'; }
-                    return;
-                }
-                let finalFsSource = fsSource;
-                if (isLogo) {
-                    finalFsSource = fsSource.replace('vec2 center_offset = vec2(r.x * 0.65, r.y * 0.5);', 'vec2 center_offset = vec2(r.x * 0.5, r.y * 0.5);');
-                }
-                const program = createProgram(gl, createShader(gl, gl.VERTEX_SHADER, vsSource), createShader(gl, gl.FRAGMENT_SHADER, finalFsSource));
-                if (!program) return;
-                gl.useProgram(program);
-                const positionLocation = gl.getAttribLocation(program, 'a_position');
-                const timeLocation = gl.getUniformLocation(program, 't');
-                const resolutionLocation = gl.getUniformLocation(program, 'r');
-                const vertices = new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]);
-                const buffer = gl.createBuffer();
-                gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-                gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-                gl.enableVertexAttribArray(positionLocation);
-                gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
-                function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight); }
-                if (!isLogo) { window.addEventListener('resize', resize); resize(); } else { gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight); }
-                let startTime = performance.now();
-                function render() {
-                    let currentTime = performance.now(); let delta = (currentTime - startTime) / 1000;
-                    gl.uniform1f(timeLocation, delta); gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
-                    gl.drawArrays(gl.TRIANGLES, 0, 6); requestAnimationFrame(render);
-                }
-                requestAnimationFrame(render);
-            }
-            function createShader(gl, type, source) { const shader = gl.createShader(type); gl.shaderSource(shader, source); gl.compileShader(shader); if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) { console.error('Shader compile error: ' + gl.getShaderInfoLog(shader)); gl.deleteShader(shader); return null; } return shader; }
-            function createProgram(gl, vs, fs) { if (!vs || !fs) return null; const program = gl.createProgram(); gl.attachShader(program, vs); gl.attachShader(program, fs); gl.linkProgram(program); if (!gl.getProgramParameter(program, gl.LINK_STATUS)) { console.error('Program link error: ' + gl.getProgramInfoLog(program)); gl.deleteProgram(program); return null; } return program; }
-            setupWebGL('glcanvas', false);
-            setupWebGL('logo-canvas', true);
-        })();
+        // --- WebGL Animation Script (Oporibortito) ---
+        (function(){const vsSource=`attribute vec2 a_position;void main(){gl_Position=vec4(a_position,0.,1.);}`;const fsSource=`\n                precision mediump float;\n                uniform float t;\n                uniform vec2 r;\n                vec2 myTanh(vec2 x){vec2 ex=exp(x);vec2 emx=exp(-x);return(ex-emx)/(ex+emx);}\n                void main(){\n                    vec4 o_bg=vec4(0.);vec4 o_anim=vec4(0.);\n                    vec2 center_offset=vec2(r.x*.65,r.y*.5);\n                    {\n                        vec2 p_img=((gl_FragCoord.xy-center_offset)*2.)/r.y;\n                        p_img.xy=vec2(p_img.y,-p_img.x);p_img*=2.5;\n                        vec2 l_val=myTanh(p_img*5.+2.);l_val=min(l_val,l_val*3.);\n                        vec2 clamped=clamp(l_val,-2.,0.);float diff_y=clamped.y-l_val.y;\n                        float safe_px=abs(p_img.x)<.001?.001:p_img.x;\n                        float term=(.1-max(.01-dot(p_img,p_img)/200.,0.)*(diff_y/safe_px))/abs(length(p_img)-.7);\n                        o_bg+=vec4(term);o_bg*=max(o_bg,vec4(0.));\n                    }\n                    {\n                        vec2 p_base=((gl_FragCoord.xy-center_offset)*2.)/r.y;p_base*=2.5;\n                        vec2 p_anim=vec2(p_base.y,-p_base.x);float angle=-400.*3.14159/180.;\n                        float s=sin(angle);float c_rot=cos(angle);mat2 rotMat=mat2(c_rot,-s,s,c_rot);\n                        vec2 p_effect=rotMat*p_base;vec2 d=vec2(-1.,1.);\n                        float denom=.1+5./dot(5.*p_effect-d,5.*p_effect-d);\n                        vec2 c=p_effect*mat2(1.,1.,d.x/denom,d.y/denom);vec2 v=c;\n                        vec4 animAccum=vec4(0.);\n                        for(int i=1;i<=9;i++){\n                            float fi=float(i);\n                            animAccum+=sin(vec4(v.x,v.y,v.y,v.x))+vec4(1.);\n                            v+=.7*sin(vec2(v.y,v.x)*fi+t)/fi+.5;\n                        }\n                        vec4 animTerm=1.-exp(-exp(c.x*vec4(.6,-.4,-1.,0.))/animAccum/(.1+.1*pow(length(sin(v/.3)*.2+c*vec2(1.,2.))-1.,2.))/(1.+7.*exp(.3*c.y-dot(c,c)))/(.03+abs(length(p_anim)-.7))*.2);\n                        o_anim+=animTerm;\n                    }\n                    vec4 finalColor=mix(o_bg,o_anim,.5)*1.5;\n                    finalColor=clamp(finalColor,0.,1.);\n                    gl_FragColor=finalColor;\n                }`;function setupWebGL(a,e){const t=document.getElementById(a);if(!t)return;const n=t.getContext("webgl");if(!n)return console.error(`WebGL not supported for canvas: ${a}`),void(e||(document.body.style.backgroundColor="#1F1301",t.style.display="none"));let o=fsSource;e&&(o=fsSource.replace("vec2 center_offset = vec2(r.x * 0.65, r.y * 0.5);","vec2 center_offset = vec2(r.x * 0.5, r.y * 0.5);"));const i=createProgram(n,createShader(n,n.VERTEX_SHADER,vsSource),createShader(n,n.FRAGMENT_SHADER,o));if(!i)return;n.useProgram(i);const s=n.getAttribLocation(i,"a_position"),l=n.getUniformLocation(i,"t"),r=n.getUniformLocation(i,"r"),c=new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),d=n.createBuffer();n.bindBuffer(n.ARRAY_BUFFER,d),n.bufferData(n.ARRAY_BUFFER,c,n.STATIC_DRAW),n.enableVertexAttribArray(s),n.vertexAttribPointer(s,2,n.FLOAT,!1,0,0);function m(){t.width=window.innerWidth,t.height=window.innerHeight,n.viewport(0,0,n.drawingBufferWidth,n.drawingBufferHeight)}e?n.viewport(0,0,n.drawingBufferWidth,n.drawingBufferHeight):(window.addEventListener("resize",m),m());let p=performance.now();!function g(){let a=performance.now(),e=(a-p)/1e3;n.uniform1f(l,e),n.uniform2f(r,t.width,t.height),n.drawArrays(n.TRIANGLES,0,6),requestAnimationFrame(g)}()}function createShader(a,e,t){const n=a.createShader(e);return a.shaderSource(n,t),a.compileShader(n),a.getShaderParameter(n,a.COMPILE_STATUS)?n:(console.error("Shader compile error: "+a.getShaderInfoLog(n)),a.deleteShader(n),null)}function createProgram(a,e,t){if(!e||!t)return null;const n=a.createProgram();return a.attachShader(n,e),a.attachShader(n,t),a.linkProgram(n),a.getProgramParameter(n,a.LINK_STATUS)?n:(console.error("Program link error: "+a.getProgramInfoLog(n)),a.deleteProgram(n),null)}setupWebGL("glcanvas",!1),setupWebGL("logo-canvas",!0)})();
 
-        // --- Chat Application Script ---
-        const langToggleBtn = document.getElementById('lang-toggle-btn');
-        const chatContainer = document.getElementById('chat-container');
-        const chatForm = document.getElementById('chat-form');
-        const promptInput = document.getElementById('prompt-input');
-        const sendBtn = document.getElementById('send-btn');
-        const stopBtn = document.getElementById('stop-btn');
-        const micBtn = document.getElementById('mic-btn');
-        const galleryBtn = document.getElementById('gallery-btn');
-        const imageUploadInput = document.getElementById('image-upload-input');
-        const imagePreviewContainer = document.getElementById('image-preview-container');
-        const imagePreview = document.getElementById('image-preview');
-        const removeImageBtn = document.getElementById('remove-image-btn');
-        const summarizeBtn = document.getElementById('summarize-btn');
-        const summaryModal = document.getElementById('summary-modal');
-        const closeModalBtn = document.getElementById('close-modal-btn');
-        const summaryContent = document.getElementById('summary-content');
-        const summaryLoading = document.getElementById('summary-loading');
-        const searchToggleBtn = document.getElementById('search-toggle-btn');
-        const updateModal = document.getElementById('update-modal');
-        const closeUpdateModalBtn = document.getElementById('close-update-modal-btn');
-        const dontShowAgainCheckbox = document.getElementById('dont-show-again');
-
-        let currentLang = 'bn';
-        let isSearchEnabled = false; 
-        let uploadedImageBase64 = null;
-        let currentAudio = null;
-        let currentPlayingBtn = null;
-        let abortController = null;
+        // --- Chat Application Script (Poribortito and Shurokkhito) ---
+        const langToggleBtn=document.getElementById("lang-toggle-btn"),chatContainer=document.getElementById("chat-container"),chatForm=document.getElementById("chat-form"),promptInput=document.getElementById("prompt-input"),sendBtn=document.getElementById("send-btn"),stopBtn=document.getElementById("stop-btn"),micBtn=document.getElementById("mic-btn"),galleryBtn=document.getElementById("gallery-btn"),imageUploadInput=document.getElementById("image-upload-input"),imagePreviewContainer=document.getElementById("image-preview-container"),imagePreview=document.getElementById("image-preview"),removeImageBtn=document.getElementById("remove-image-btn"),summarizeBtn=document.getElementById("summarize-btn"),summaryModal=document.getElementById("summary-modal"),closeModalBtn=document.getElementById("close-modal-btn"),summaryContent=document.getElementById("summary-content"),summaryLoading=document.getElementById("summary-loading"),searchToggleBtn=document.getElementById("search-toggle-btn"),updateModal=document.getElementById("update-modal"),closeUpdateModalBtn=document.getElementById("close-update-modal-btn"),dontShowAgainCheckbox=document.getElementById("dont-show-again");let currentLang="bn",isSearchEnabled=!1,uploadedImageBase64=null,currentAudio=null,currentPlayingBtn=null,abortController=null;const systemInstruction={role:"system",parts:[{text:"You are Tanim AI, a helpful AI assistant. Your primary language is Bengali (Bangla). Your secondary language is English. Use 'Assalamualaikum' only for the very first greeting if appropriate, but do not repeat it in every subsequent response. Never use 'Nomoskar'. When answering questions about math, physics, or chemistry, ALWAYS format equations and formulas using LaTeX code. For formulas that are part of a sentence, use single dollar signs (e.g., the formula is $E=mc^2$). For standalone equations that need their own line, use double dollar signs (e.g., $$x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}$$). Ensure text flows naturally around inline formulas without unnecessary line breaks. Write your answers in a well-organized, eloquent, and beautiful style. Be thorough and clear."}]};let chatHistory=[];const translations={en:{welcome_message:"Assalamualaikum, I am Tanim AI. How can I help you?",placeholder:"Type your message...",lang_btn:"বাংলা",summarize_btn:"✨ Summarize",summary_title:"Conversation Summary",summarizing:"Summarizing...",error_message:"Sorry, an error occurred. Please try again."},bn:{welcome_message:"আসসালামু আলাইকুম, আমি তানিম এআই। আমি আপনাকে কিভাবে সাহায্য করতে পারি?",placeholder:"আপনার বার্তা লিখুন...",lang_btn:"English",summarize_btn:"✨ সারসংক্ষেপ",summary_title:"কথোপকথনের সারসংক্ষেপ",summarizing:"সারসংক্ষেপ করা হচ্ছে...",error_message:"দুঃখিত, একটি ত্রুটি ঘটেছে। অনুগ্রহ করে আবার চেষ্টা করুন।"}};const setLanguage=a=>{currentLang=a,document.querySelectorAll("[data-lang-key]").forEach(e=>{const t=e.getAttribute("data-lang-key");translations[a][t]&&("INPUT"===e.tagName?e.placeholder=translations[a][t]:e.innerHTML=translations[a][t])}),langToggleBtn.textContent=translations[a].lang_btn};const addMessageToUI=(a,e,t=null)=>{const n=document.createElement("div");n.className=`flex mb-4 ${"user"===e?"justify-end":"justify-start"}`;const o=document.createElement("div");if(o.className=`message-bubble ${e} p-3 rounded-lg max-w-[85%] inline-block`,t){const a=document.createElement("img");a.src=t,a.className="rounded-md mb-2 max-w-full h-auto",o.appendChild(a)}if(a){const e=document.createElement("div");e.innerHTML=a.replace(/\n/g,"<br>"),o.appendChild(e)}if("ai"===e&&a){const e=document.createElement("button");e.className="tts-btn ml-2 align-middle inline-block",e.innerHTML='<svg class="speaker-icon-off" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M11.536 14.01A8.473 8.473 0 0 0 14.026 8a8.473 8.473 0 0 0-2.49-6.01l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707z"/><path d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.483 5.483 0 0 1 11.025 8a5.483 5.483 0 0 1-1.61 3.89l.706.706z"/><path d="M8.707 11.182A4.486 4.486 0 0 0 10.025 8a4.486 4.486 0 0 0-1.318-3.182L8 5.525A3.489 3.489 0 0 1 9.025 8 3.49 3.49 0 0 1 8 10.475l.707.707zM6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.063-1.89a.5.5 0 0 1 .829-.06z"/></svg><svg class="speaker-icon-on" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M11.536 14.01A8.473 8.473 0 0 0 14.026 8a8.473 8.473 0 0 0-2.49-6.01l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707zm-1.414-.707A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.483 5.483 0 0 1 11.025 8a5.483 5.483 0 0 1-1.61 3.89l.706.706zm-1.414-.707A4.486 4.486 0 0 0 10.025 8a4.486 4.486 0 0 0-1.318-3.182L8 5.525A3.489 3.489 0 0 1 9.025 8 3.49 3.49 0 0 1 8 10.475l.707.707zM6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.063-1.89a.5.5 0 0 1 .829-.06z"/></svg>',e.onclick=()=>handleTTS(a,e),o.appendChild(e)}n.appendChild(o),chatContainer.appendChild(n),"ai"===e&&window.MathJax&&MathJax.typesetPromise([o]),chatContainer.scrollTop=chatContainer.scrollHeight};const showLoadingIndicator=()=>{const a=document.createElement("div");a.id="ai-loader",a.className="flex justify-start mb-4",a.innerHTML='<div class="message-bubble ai p-3 rounded-lg"><div class="loader-spinner"></div></div>',chatContainer.appendChild(a),chatContainer.scrollTop=chatContainer.scrollHeight},hideLoadingIndicator=()=>{const a=document.getElementById("ai-loader");a&&a.remove()},toggleSendStopButtons=a=>{sendBtn.classList.toggle("hidden",a),stopBtn.classList.toggle("hidden",!a)};
         
-        const systemInstruction = {
-            role: "system",
-            parts: [{ text: "You are Tanim AI, a helpful AI assistant. Your primary language is Bengali (Bangla). Your secondary language is English. Use 'Assalamualaikum' only for the very first greeting if appropriate, but do not repeat it in every subsequent response. Never use 'Nomoskar'. When answering questions about math, physics, or chemistry, ALWAYS format equations and formulas using LaTeX code. For formulas that are part of a sentence, use single dollar signs (e.g., the formula is $E=mc^2$). For standalone equations that need their own line, use double dollar signs (e.g., $$x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}$$). Ensure text flows naturally around inline formulas without unnecessary line breaks. Write your answers in a well-organized, eloquent, and beautiful style. Be thorough and clear." }]
-        };
-        let chatHistory = [];
-
-        const translations = {
-            en: { welcome_message: "Assalamualaikum, I am Tanim AI. How can I help you?", placeholder: "Type your message...", lang_btn: "বাংলা", summarize_btn: "✨ Summarize", summary_title: "Conversation Summary", summarizing: "Summarizing...", error_message: "Sorry, an error occurred. Please try again." },
-            bn: { welcome_message: "আসসালামু আলাইকুম, আমি তানিম এআই। আমি আপনাকে কিভাবে সাহায্য করতে পারি?", placeholder: "আপনার বার্তা লিখুন...", lang_btn: "English", summarize_btn: "✨ সারসংক্ষেপ", summary_title: "কথোপকথনের সারসংক্ষেপ", summarizing: "সারসংক্ষেপ করা হচ্ছে...", error_message: "দুঃখিত, একটি ত্রুটি ঘটেছে। অনুগ্রহ করে আবার চেষ্টা করুন।" }
-        };
-
-        const setLanguage = (lang) => {
-            currentLang = lang;
-            document.querySelectorAll('[data-lang-key]').forEach(el => {
-                const key = el.getAttribute('data-lang-key');
-                if (translations[lang][key]) {
-                    if (el.tagName === 'INPUT') el.placeholder = translations[lang][key];
-                    else el.innerHTML = translations[lang][key];
-                }
-            });
-            langToggleBtn.textContent = translations[lang].lang_btn;
-        };
-
-        const addMessageToUI = (text, sender, imageSrc = null) => {
-            const wrapper = document.createElement('div');
-            wrapper.className = `flex mb-4 ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
-            
-            const contentWrapper = document.createElement('div');
-            contentWrapper.className = `message-bubble ${sender} p-3 rounded-lg max-w-[85%] inline-block`;
-            
-            if (imageSrc) {
-                const img = document.createElement('img');
-                img.src = imageSrc;
-                img.className = 'rounded-md mb-2 max-w-full h-auto';
-                contentWrapper.appendChild(img);
-            }
-            
-            if (text) {
-                const textElement = document.createElement('div');
-                textElement.innerHTML = text.replace(/\n/g, '<br>');
-                contentWrapper.appendChild(textElement);
-            }
-            
-            if (sender === 'ai' && text) {
-                const ttsBtn = document.createElement('button');
-                ttsBtn.className = 'tts-btn ml-2 align-middle inline-block';
-                ttsBtn.innerHTML = `<svg class="speaker-icon-off" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M11.536 14.01A8.473 8.473 0 0 0 14.026 8a8.473 8.473 0 0 0-2.49-6.01l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707z"/><path d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.483 5.483 0 0 1 11.025 8a5.483 5.483 0 0 1-1.61 3.89l.706.706z"/><path d="M8.707 11.182A4.486 4.486 0 0 0 10.025 8a4.486 4.486 0 0 0-1.318-3.182L8 5.525A3.489 3.489 0 0 1 9.025 8 3.49 3.49 0 0 1 8 10.475l.707.707zM6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.063-1.89a.5.5 0 0 1 .829-.06z"/></svg><svg class="speaker-icon-on" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M11.536 14.01A8.473 8.473 0 0 0 14.026 8a8.473 8.473 0 0 0-2.49-6.01l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707zm-1.414-.707A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.483 5.483 0 0 1 11.025 8a5.483 5.483 0 0 1-1.61 3.89l.706.706zm-1.414-.707A4.486 4.486 0 0 0 10.025 8a4.486 4.486 0 0 0-1.318-3.182L8 5.525A3.489 3.489 0 0 1 9.025 8 3.49 3.49 0 0 1 8 10.475l.707.707zM6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.063-1.89a.5.5 0 0 1 .829-.06z"/></svg>`;
-                ttsBtn.onclick = () => handleTTS(text, ttsBtn);
-                contentWrapper.appendChild(ttsBtn);
-            }
-            
-            wrapper.appendChild(contentWrapper);
-            chatContainer.appendChild(wrapper);
-            
-            if (sender === 'ai' && window.MathJax) {
-                MathJax.typesetPromise([contentWrapper]);
-            }
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        };
-
-        const showLoadingIndicator = () => {
-            const loaderWrapper = document.createElement('div');
-            loaderWrapper.id = 'ai-loader';
-            loaderWrapper.className = 'flex justify-start mb-4';
-            loaderWrapper.innerHTML = `<div class="message-bubble ai p-3 rounded-lg"><div class="loader-spinner"></div></div>`;
-            chatContainer.appendChild(loaderWrapper);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        };
-
-        const hideLoadingIndicator = () => {
-            const loader = document.getElementById('ai-loader');
-            if (loader) loader.remove();
-        };
-        
-        const toggleSendStopButtons = (showStop) => {
-            sendBtn.classList.toggle('hidden', showStop);
-            stopBtn.classList.toggle('hidden', !showStop);
-        };
-
-        const callGeminiAPI = async (payload) => {
+        async function callUnifiedAPI(action, payload) {
             abortController = new AbortController();
             const signal = abortController.signal;
-            const apiKey = ""; // Environment will provide this
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-
-            // Add search tool to payload if enabled
-            if (isSearchEnabled) {
-                payload.tools = [{ "google_search": {} }];
-            }
 
             try {
-                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), signal });
-                if (!response.ok) throw new Error(`API Error: ${response.status}`);
-                const result = await response.json();
-                if (!result.candidates || result.candidates.length === 0) {
-                    if (result.promptFeedback && result.promptFeedback.blockReason) {
-                        console.warn(`Request blocked: ${result.promptFeedback.blockReason}`);
-                        return `দুঃখিত, আপনার অনুরোধটি ব্লক করা হয়েছে (${result.promptFeedback.blockReason})।`;
-                    }
-                    return translations[currentLang].error_message;
+                const response = await fetch('/api/gemini', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    // Body te ekhon action o pathano hocche
+                    body: JSON.stringify({ action: action, payload: payload }),
+                    signal
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `Function Error: ${response.status}`);
                 }
-                return result?.candidates?.[0]?.content?.parts?.[0]?.text || translations[currentLang].error_message;
+                
+                return await response.json();
+
             } catch (error) {
-                if (error.name === 'AbortError') { return 'Generation stopped.'; }
+                if (error.name === 'AbortError') { 
+                    console.log('Fetch aborted by user.');
+                    return null; // Return null or a specific object for abortion
+                }
                 console.error("API Call Error:", error);
                 throw error;
             }
-        };
+        }
 
         const handleChatSubmit = async (e) => {
             e.preventDefault();
             const userPrompt = promptInput.value.trim();
             if (!userPrompt && !uploadedImageBase64) return;
-
             const imageSrcForUI = uploadedImageBase64 ? `data:image/png;base64,${uploadedImageBase64}` : null;
-            addMessageToUI(userPrompt, 'user', imageSrcForUI);
-            
+            addMessageToUI(userPrompt, "user", imageSrcForUI);
             const userParts = [{ text: userPrompt }];
             if (uploadedImageBase64) {
                 userParts.push({ inlineData: { mimeType: "image/png", data: uploadedImageBase64 } });
             }
             const userMessage = { role: "user", parts: userParts };
-            
             promptInput.value = '';
             clearImagePreview();
             promptInput.disabled = true;
             toggleSendStopButtons(true);
             showLoadingIndicator();
-
             try {
                 const payload = { contents: [...chatHistory, userMessage], systemInstruction };
-                const finalResponse = await callGeminiAPI(payload);
-                
-                hideLoadingIndicator();
-                addMessageToUI(finalResponse, 'ai');
-                
-                chatHistory.push(userMessage, { role: "model", parts: [{ text: finalResponse }] });
-
+                if (isSearchEnabled) {
+                    payload.tools = [{ "google_search": {} }];
+                }
+                const result = await callUnifiedAPI('chat', payload);
+                if (result) {
+                    const finalResponse = result.candidates?.[0]?.content?.parts?.[0]?.text || translations[currentLang].error_message;
+                    hideLoadingIndicator();
+                    addMessageToUI(finalResponse, 'ai');
+                    chatHistory.push(userMessage, { role: "model", parts: [{ text: finalResponse }] });
+                } else {
+                    hideLoadingIndicator(); // Handle abortion case
+                }
             } catch (error) {
                 hideLoadingIndicator();
                 addMessageToUI(`${translations[currentLang].error_message}`, 'ai');
@@ -509,84 +230,45 @@
             }
         };
 
-        const handleImageUpload = (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                uploadedImageBase64 = event.target.result.split(',')[1];
-                imagePreview.src = event.target.result;
-                imagePreviewContainer.classList.remove('hidden');
-            };
-            reader.readAsDataURL(file);
-        };
-        
-        const clearImagePreview = () => {
-             uploadedImageBase64 = null;
-             imagePreview.src = '';
-             imagePreviewContainer.classList.add('hidden');
-             imageUploadInput.value = '';
-        };
-
         const handleSummarize = async () => {
-            summaryModal.classList.remove('hidden');
-            summaryContent.classList.add('hidden');
-            summaryLoading.classList.remove('hidden');
-
-            const conversation = chatHistory.map(item => `${item.role}: ${item.parts.map(p => p.text).join(' ')}`).join('\n');
+            summaryModal.classList.remove("hidden");
+            summaryContent.classList.add("hidden");
+            summaryLoading.classList.remove("hidden");
+            const conversation = chatHistory.map(item => `${item.role}: ${item.parts.map(p => p.text).join(" ")}`).join("\n");
             const summaryPrompt = `Please provide a concise summary in ${currentLang === 'bn' ? 'Bengali' : 'English'} of the following conversation:\n\n${conversation}`;
-            // NOTE: Summarization will not use the web search tool.
-            const payload = { contents: [{role: 'user', parts: [{text: summaryPrompt}]}], systemInstruction };
-
+            const payload = { contents: [{ role: 'user', parts: [{ text: summaryPrompt }] }], systemInstruction };
             try {
-                // Manually create a new controller for summarize as it's a separate flow
-                const summaryAbortController = new AbortController();
-                const signal = summaryAbortController.signal;
-                const apiKey = "";
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-                
-                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), signal });
-                if (!response.ok) throw new Error(`API Error: ${response.status}`);
-                const result = await response.json();
+                const result = await callUnifiedAPI('summarize', payload);
                 const summary = result?.candidates?.[0]?.content?.parts?.[0]?.text || translations[currentLang].error_message;
-
-                summaryContent.innerHTML = summary.replace(/\n/g, '<br>');
+                summaryContent.innerHTML = summary.replace(/\n/g, "<br>");
             } catch (error) {
                 console.error("Summarize Error:", error);
                 summaryContent.textContent = translations[currentLang].error_message;
             } finally {
-                summaryLoading.classList.add('hidden');
-                summaryContent.classList.remove('hidden');
+                summaryLoading.classList.add("hidden");
+                summaryContent.classList.remove("hidden");
             }
         };
-
-        // --- TTS Helper Functions ---
-        const base64ToArrayBuffer = (base64) => { const binaryString = atob(base64); const len = binaryString.length; const bytes = new Uint8Array(len); for (let i = 0; i < len; i++) { bytes[i] = binaryString.charCodeAt(i); } return bytes.buffer; };
-        const writeString = (view, offset, string) => { for (let i = 0; i < string.length; i++) { view.setUint8(offset + i, string.charCodeAt(i)); } };
-        const pcmToWav = (pcmData, sampleRate) => { const buffer = new ArrayBuffer(44 + pcmData.byteLength); const view = new DataView(buffer); writeString(view, 0, 'RIFF'); view.setUint32(4, 36 + pcmData.byteLength, true); writeString(view, 8, 'WAVE'); writeString(view, 12, 'fmt '); view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, 1, true); view.setUint32(24, sampleRate, true); view.setUint32(28, sampleRate * 2, true); view.setUint16(32, 2, true); view.setUint16(34, 16, true); writeString(view, 36, 'data'); view.setUint32(40, pcmData.byteLength, true); const pcmAsUint8 = new Uint8Array(pcmData.buffer, pcmData.byteOffset, pcmData.byteLength); new Uint8Array(view.buffer, 44).set(pcmAsUint8); return new Blob([view], { type: 'audio/wav' }); };
-
 
         const handleTTS = async (text, btn) => {
             if (currentAudio && !currentAudio.paused) {
                 currentAudio.pause();
                 if (currentPlayingBtn) currentPlayingBtn.classList.remove('playing');
-                if (currentPlayingBtn === btn) { currentPlayingBtn = null; currentAudio = null; return; }
+                if (currentPlayingBtn === btn) {
+                    currentPlayingBtn = null;
+                    currentAudio = null;
+                    return;
+                }
             }
-            
             btn.classList.add('playing');
             currentPlayingBtn = btn;
-
             try {
                 const payload = {
                     contents: [{ parts: [{ text: `Say in a natural and clear voice: ${text}` }] }],
                     generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } } } },
                     model: "gemini-2.5-flash-preview-tts"
                 };
-                const apiKey = "AIzaSyB0oAGCxTyGE_K5u4g5cI7nXiUxfxBy8Ag";
-                const apiUrl = `https://generativelanguage.googleapis.com///:generateContent?key=${apiKey}`;
-                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                if (!response.ok) throw new Error(`TTS API Error: ${response.status}`);
-                const result = await response.json();
+                const result = await callUnifiedAPI('tts', payload);
                 const part = result?.candidates?.[0]?.content?.parts?.[0];
                 const audioData = part?.inlineData?.data;
                 const mimeType = part?.inlineData?.mimeType;
@@ -597,73 +279,25 @@
                     const pcm16 = new Int16Array(pcmBuffer);
                     const wavBlob = pcmToWav(pcm16, sampleRate);
                     const audioUrl = URL.createObjectURL(wavBlob);
-                    
                     currentAudio = new Audio(audioUrl);
-                    currentAudio.onended = () => { btn.classList.remove('playing'); currentPlayingBtn = null; currentAudio = null; };
+                    currentAudio.onended = () => {
+                        btn.classList.remove('playing');
+                        currentPlayingBtn = null;
+                        currentAudio = null;
+                    };
                     currentAudio.play();
-                } else { throw new Error("Invalid audio data received."); }
+                } else {
+                    throw new Error("Invalid audio data received.");
+                }
             } catch (error) {
                 console.error("TTS Error:", error);
                 btn.classList.remove('playing');
                 currentPlayingBtn = null;
             }
         };
-
-        const handleMicInput = () => {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) return alert("Sorry, speech recognition is not supported in this browser.");
-
-            const recognition = new SpeechRecognition();
-            recognition.lang = currentLang === 'bn' ? 'bn-BD' : 'en-US';
-            recognition.interimResults = false;
-            recognition.maxAlternatives = 1;
-            micBtn.classList.add('listening');
-            recognition.start();
-            recognition.onresult = (event) => { promptInput.value = event.results[0][0].transcript; };
-            recognition.onspeechend = () => { recognition.stop(); micBtn.classList.remove('listening'); };
-            recognition.onerror = (event) => { console.error("Speech recognition error:", event.error); micBtn.classList.remove('listening'); };
-        };
         
-        const setAppHeight = () => {
-            document.getElementById('app-container').style.height = `${window.innerHeight}px`;
-        };
-        
-        const handleSearchToggle = () => {
-            isSearchEnabled = !isSearchEnabled;
-            searchToggleBtn.classList.toggle('search-active', isSearchEnabled);
-        };
-
-        // --- Event Listeners ---
-        langToggleBtn.addEventListener('click', () => setLanguage(currentLang === 'en' ? 'bn' : 'en'));
-        chatForm.addEventListener('submit', handleChatSubmit);
-        galleryBtn.addEventListener('click', () => imageUploadInput.click());
-        imageUploadInput.addEventListener('change', handleImageUpload);
-        removeImageBtn.addEventListener('click', clearImagePreview);
-        summarizeBtn.addEventListener('click', handleSummarize);
-        closeModalBtn.addEventListener('click', () => summaryModal.classList.add('hidden'));
-        stopBtn.addEventListener('click', () => abortController?.abort());
-        micBtn.addEventListener('click', handleMicInput);
-        searchToggleBtn.addEventListener('click', handleSearchToggle); 
-        
-        closeUpdateModalBtn.addEventListener('click', () => {
-            if (dontShowAgainCheckbox.checked) {
-                localStorage.setItem('hideUpdateModal', 'true');
-            }
-            updateModal.classList.add('hidden');
-        });
-        
-        window.addEventListener('resize', setAppHeight);
-
-        // --- Initial Setup ---
-        setLanguage('bn');
-        setAppHeight();
-        document.querySelector('[data-lang-key="welcome_message"]').textContent = translations.bn.welcome_message;
-
-        // Show update modal on load if not disabled
-        const hideModal = localStorage.getItem('hideUpdateModal');
-        if (hideModal !== 'true') {
-            updateModal.classList.remove('hidden');
-        }
+        // Baki shob helper functions oporibortito
+        const base64ToArrayBuffer=a=>{const e=atob(a),t=e.length,n=new Uint8Array(t);for(let a=0;a<t;a++)n[a]=e.charCodeAt(a);return n.buffer},writeString=(a,e,t)=>{for(let n=0;n<t.length;n++)a.setUint8(e+n,t.charCodeAt(n))},pcmToWav=(a,e)=>{const t=new ArrayBuffer(44+a.byteLength),n=new DataView(t);writeString(n,0,"RIFF"),n.setUint32(4,36+a.byteLength,!0),writeString(n,8,"WAVE"),writeString(n,12,"fmt "),n.setUint32(16,16,!0),n.setUint16(20,1,!0),n.setUint16(22,1,!0),n.setUint32(24,e,!0),n.setUint32(28,2*e,!0),n.setUint16(32,2,!0),n.setUint16(34,16,!0),writeString(n,36,"data"),n.setUint32(40,a.byteLength,!0);const o=new Uint8Array(a.buffer,a.byteOffset,a.byteLength);return new Uint8Array(n.buffer,44).set(o),new Blob([n],{type:"audio/wav"})};const handleImageUpload=a=>{const e=a.target.files[0];if(!e)return;const t=new FileReader;t.onload=a=>{uploadedImageBase64=a.target.result.split(",")[1],imagePreview.src=a.target.result,imagePreviewContainer.classList.remove("hidden")},t.readAsDataURL(e)},clearImagePreview=()=>{uploadedImageBase64=null,imagePreview.src="",imagePreviewContainer.classList.add("hidden"),imageUploadInput.value=""};const handleMicInput=()=>{const a=window.SpeechRecognition||window.webkitSpeechRecognition;if(!a)return alert("Sorry, speech recognition is not supported in this browser.");const e=new a;e.lang="bn"===currentLang?"bn-BD":"en-US",e.interimResults=!1,e.maxAlternatives=1,micBtn.classList.add("listening"),e.start(),e.onresult=a=>{promptInput.value=a.results[0][0].transcript},e.onspeechend=()=>{e.stop(),micBtn.classList.remove("listening")},e.onerror=a=>{console.error("Speech recognition error:",a.error),micBtn.classList.remove("listening")}};const setAppHeight=()=>{document.getElementById("app-container").style.height=`${window.innerHeight}px`};const handleSearchToggle=()=>{isSearchEnabled=!isSearchEnabled,searchToggleBtn.classList.toggle("search-active",isSearchEnabled)};langToggleBtn.addEventListener("click",()=>setLanguage("en"===currentLang?"bn":"en")),chatForm.addEventListener("submit",handleChatSubmit),galleryBtn.addEventListener("click",()=>imageUploadInput.click()),imageUploadInput.addEventListener("change",handleImageUpload),removeImageBtn.addEventListener("click",clearImagePreview),summarizeBtn.addEventListener("click",handleSummarize),closeModalBtn.addEventListener("click",()=>summaryModal.classList.add("hidden")),stopBtn.addEventListener("click",()=>abortController?.abort()),micBtn.addEventListener("click",handleMicInput),searchToggleBtn.addEventListener("click",handleSearchToggle),closeUpdateModalBtn.addEventListener("click",()=>{dontShowAgainCheckbox.checked&&localStorage.setItem("hideUpdateModal","true"),updateModal.classList.add("hidden")}),window.addEventListener("resize",setAppHeight),setLanguage("bn"),setAppHeight(),document.querySelector('[data-lang-key="welcome_message"]').textContent=translations.bn.welcome_message;const hideModal=localStorage.getItem("hideUpdateModal");"true"!==hideModal&&updateModal.classList.remove("hidden");
 
     </script>
 </body>
